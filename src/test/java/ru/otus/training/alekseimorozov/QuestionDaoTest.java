@@ -1,24 +1,27 @@
 package ru.otus.training.alekseimorozov;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.otus.training.alekseimorozov.quize.dao.QuestionDao;
-import ru.otus.training.alekseimorozov.quize.dao.QuestionDaoImpl;
 import ru.otus.training.alekseimorozov.quize.entity.Answer;
 import ru.otus.training.alekseimorozov.quize.entity.Question;
-
-import java.io.IOException;
+import ru.otus.training.alekseimorozov.quize.entity.QuizException;
 import java.util.List;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class QuestionDaoTest {
+public class QuestionDaoTest extends CommonRules {
+    private static QuestionDao questionDao;
+
+    @BeforeClass
+    public static void initQuestionDao() {
+        init();
+        questionDao = (QuestionDao) getContext().getBean("questionDao");
+    }
     @Test
-    public void findAllTest() throws IOException {
-        QuestionDao questionDao = new QuestionDaoImpl("questions.csv");
-        List<Question> actualQuestions = questionDao.findAll();
-        assertEquals(actualQuestions.size(), 2);
+    public void findAllTest() {
+        List<Question> actualQuestions = questionDao.findAll("questions.csv");
+        assertEquals(2, actualQuestions.size());
         Question actualOne = actualQuestions.get(0);
         assertEquals(Integer.valueOf(1), actualOne.getId());
         assertEquals("Вопрос первый", actualOne.getContent());
@@ -45,9 +48,33 @@ public class QuestionDaoTest {
         assertEquals("ответ 3", actualAnswersTwo.get(2).getContent());
     }
 
-    @Test(expected = IOException.class)
-    public void fileNotFoundTest() throws IOException {
-        QuestionDao questionDao = new QuestionDaoImpl("notexist.csv");
-        questionDao.findAll();
+    @Test(expected = QuizException.class)
+    public void fileNotFoundTest() {
+        questionDao.findAll("notexist.csv");
+    }
+
+    @Test(expected = QuizException.class)
+    public void incorrectQuestionIdTest() {
+        questionDao.findAll("incorrectQuestionId.csv");
+    }
+
+    @Test(expected = QuizException.class)
+    public void incorrectQuestionContentTest() {
+        questionDao.findAll("incorrectQuestionContent.csv");
+    }
+
+    @Test(expected = QuizException.class)
+    public void incorrectFileFormatTest() {
+        questionDao.findAll("incorrectFileFormat.csv");
+    }
+
+    @Test(expected = QuizException.class)
+    public void incorrectAnswerIdTest() {
+        questionDao.findAll("incorrectAnswerId.csv");
+    }
+
+    @Test(expected = QuizException.class)
+    public void incorrectAnswerContentTest() {
+        questionDao.findAll("incorrectAnswerContent.csv");
     }
 }

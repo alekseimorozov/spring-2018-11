@@ -14,6 +14,7 @@ public class Question {
     }
 
     public void setId(Integer id) {
+        verifyId(id);
         this.id = id;
     }
 
@@ -22,6 +23,7 @@ public class Question {
     }
 
     public void setContent(String content) {
+        verifyContent(content);
         this.content = content;
     }
 
@@ -30,6 +32,7 @@ public class Question {
     }
 
     public void setCorrectAnswerId(String correctAnswerId) {
+        verifyCorrectAnswerId(correctAnswerId);
         this.correctAnswerId = correctAnswerId;
     }
 
@@ -38,7 +41,36 @@ public class Question {
     }
 
     public void setAnswers(List<Answer> answers) {
+        verifyAnswers(answers);
         this.answers = answers;
+    }
+
+    private void verifyId(Integer id) {
+        if (id == null) {
+            throwQuizException("wrong question id (null)");
+        }
+    }
+
+    private void verifyContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throwQuizException("Wrong question content (empty or null)");
+        }
+    }
+
+    private void verifyCorrectAnswerId(String correctAnswerId) {
+        if (correctAnswerId == null || correctAnswerId.trim().isEmpty()) {
+            throwQuizException("Wrong question correctAnswerId (empty or null)");
+        }
+    }
+
+    private void verifyAnswers(List<Answer> answers) {
+        if (answers == null || answers.size() == 0) {
+            throwQuizException("wrong question answers list (empty or null)");
+        }
+    }
+
+    private void throwQuizException(String message) {
+        throw new QuizException(message);
     }
 
     @Override

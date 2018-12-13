@@ -3,7 +3,6 @@ package ru.otus.training.alekseimorozov.quize.service;
 import ru.otus.training.alekseimorozov.quize.dao.QuestionDao;
 import ru.otus.training.alekseimorozov.quize.entity.Question;
 
-import java.io.IOException;
 import java.util.List;
 
 public class QuizServiceImpl implements QuizService {
@@ -14,7 +13,8 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<Question> getQuizQuestions() throws IOException {
-        return questionDao.findAll();
+    public List<Question> getQuizQuestions(String fileName) {
+        return questionDao.findAll(fileName);
     }
+
 }
