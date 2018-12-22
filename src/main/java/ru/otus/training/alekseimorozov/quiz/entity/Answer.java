@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.quize.entity;
+package ru.otus.training.alekseimorozov.quiz.entity;
 
 public class Answer {
     private String id;

@@ -1,23 +1,16 @@
-package ru.otus.training.alekseimorozov;
+package ru.otus.training.alekseimorozov.quiz.dao;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.otus.training.alekseimorozov.quize.dao.QuestionDao;
-import ru.otus.training.alekseimorozov.quize.entity.Answer;
-import ru.otus.training.alekseimorozov.quize.entity.Question;
-import ru.otus.training.alekseimorozov.quize.entity.QuizException;
+import ru.otus.training.alekseimorozov.quiz.entity.Answer;
+import ru.otus.training.alekseimorozov.quiz.entity.Question;
+import ru.otus.training.alekseimorozov.quiz.entity.QuizException;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class QuestionDaoTest extends CommonRules {
-    private static QuestionDao questionDao;
+public class QuestionDaoTest {
+    private static QuestionDao questionDao = new QuestionDaoImpl();
 
-    @BeforeClass
-    public static void initQuestionDao() {
-        init();
-        questionDao = (QuestionDao) getContext().getBean("questionDao");
-    }
     @Test
     public void findAllTest() {
         List<Question> actualQuestions = questionDao.findAll("questions.csv");

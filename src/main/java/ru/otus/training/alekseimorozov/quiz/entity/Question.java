@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.quize.entity;
+package ru.otus.training.alekseimorozov.quiz.entity;
 
 import java.util.ArrayList;
 import java.util.List;
