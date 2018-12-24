@@ -1,10 +1,10 @@
 package ru.otus.training.alekseimorozov.quiz.controller;
 
-import static java.lang.System.out;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Controller;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 import ru.otus.training.alekseimorozov.quiz.configuration.QuizProperties;
 import ru.otus.training.alekseimorozov.quiz.entity.Answer;
 import ru.otus.training.alekseimorozov.quiz.entity.Question;
@@ -12,23 +12,26 @@ import ru.otus.training.alekseimorozov.quiz.service.QuizService;
 
 import java.util.*;
 
-@Controller
-public class QuizController {
+import static java.lang.System.out;
+
+@ShellComponent
+public class QuizShellController {
     private QuizService quizService;
     private MessageSource messageSource;
     private QuizProperties quizProperties;
 
     @Autowired
-    public QuizController(QuizService quizService, MessageSource messageSource, QuizProperties quizProperties) {
+    public QuizShellController(QuizService quizService, MessageSource messageSource, QuizProperties quizProperties) {
         this.quizService = quizService;
-        this.quizProperties = quizProperties;
         this.messageSource = messageSource;
+        this.quizProperties = quizProperties;
     }
 
-    public void runQuiz() {
+    @ShellMethod(value = "run quiz. If you want to start quiz in definite locale, add language tag as argument (for " +
+            "example: start es-ES)", group = "quiz commands")
+    public void start(@ShellOption(defaultValue = "") String locale) {
         Scanner scanner = new Scanner(System.in);
-        Locale quizLocale;
-        quizLocale = getLocale(scanner);
+        Locale quizLocale = locale.isEmpty() ? getLocale(scanner) : Locale.forLanguageTag(locale);
         out.println(messageSource.getMessage("entername", null, quizLocale));
         String name = scanner.nextLine();
         List<Question> questions = quizService.getQuizQuestions(quizProperties.getQuizSource(quizLocale));
