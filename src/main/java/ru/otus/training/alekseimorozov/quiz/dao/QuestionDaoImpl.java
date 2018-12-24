@@ -1,17 +1,18 @@
-package ru.otus.training.alekseimorozov.quize.dao;
+package ru.otus.training.alekseimorozov.quiz.dao;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import ru.otus.training.alekseimorozov.quize.entity.Answer;
-import ru.otus.training.alekseimorozov.quize.entity.Question;
-import ru.otus.training.alekseimorozov.quize.entity.QuizException;
+import org.springframework.stereotype.Repository;
+import ru.otus.training.alekseimorozov.quiz.entity.Answer;
+import ru.otus.training.alekseimorozov.quiz.entity.Question;
+import ru.otus.training.alekseimorozov.quiz.entity.QuizException;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class QuestionDaoImpl implements QuestionDao {
-
     @Override
     public List<Question> findAll(String fileName) {
         InputStream questionsStream = getClass().getClassLoader().getResourceAsStream(fileName);
