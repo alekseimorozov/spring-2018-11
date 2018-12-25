@@ -1,10 +1,10 @@
-package ru.otus.training.alekseimorozov.quiz.controller;
+package ru.otus.training.alekseimorozov.quiz.service;
 
 import static java.lang.System.out;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import ru.otus.training.alekseimorozov.quiz.configuration.QuizProperties;
 import ru.otus.training.alekseimorozov.quiz.entity.Answer;
 import ru.otus.training.alekseimorozov.quiz.entity.Question;
@@ -12,8 +12,8 @@ import ru.otus.training.alekseimorozov.quiz.service.QuizService;
 
 import java.util.*;
 
-@Controller
-public class QuizController {
+@Service
+public class QuizRunner {
     private Scanner scanner;
     private QuizService quizService;
     private MessageSource messageSource;
@@ -24,7 +24,7 @@ public class QuizController {
 
 
     @Autowired
-    public QuizController(QuizService quizService, MessageSource messageSource, QuizProperties quizProperties) {
+    public QuizRunner(QuizService quizService, MessageSource messageSource, QuizProperties quizProperties) {
         this.quizService = quizService;
         this.quizProperties = quizProperties;
         this.messageSource = messageSource;

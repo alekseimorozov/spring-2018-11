@@ -6,23 +6,23 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import org.springframework.shell.standard.ShellOption;
-import ru.otus.training.alekseimorozov.quiz.controller.QuizController;
+import ru.otus.training.alekseimorozov.quiz.service.QuizRunner;
 
 @ShellComponent
-public class QuizShellRunner {
+public class QuizShellCommand {
     private static final String LANGUAGE_NOT_CHOSEN = ": language hasn't been chosen yet." +
             "\n\tEnter \"language\" command to choose language.";
     private static final String LANGUAGE_AND_NAME_NOT_SET = ": language and/or name hasn't been set yet." +
             "\n\tEnter \"language\" command to choose language.\n\tEnter \"name\" command to set name.";
     private static final String RESULT_NOT_READY = ": quiz hasn't been done yet. Enter \"start\" command to run quiz.";
 
-    private QuizController quizController;
+    private QuizRunner quizController;
     private boolean isLocaleChosen;
     private boolean isNameSet;
     private boolean isResultReady;
 
     @Autowired
-    public QuizShellRunner(QuizController quizController) {
+    public QuizShellCommand(QuizRunner quizController) {
         this.quizController = quizController;
     }
 
