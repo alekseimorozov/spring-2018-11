@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.quiz.configuration;
+package ru.otus.training.alekseimorozov.practicelib.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
