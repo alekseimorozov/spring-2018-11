@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.practicelib.entity;
+package ru.otus.training.alekseimorozov.bibliootus.entity;
 
 import java.io.Serializable;
 

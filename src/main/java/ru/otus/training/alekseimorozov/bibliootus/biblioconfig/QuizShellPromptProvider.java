@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.practicelib.configuration;
+package ru.otus.training.alekseimorozov.bibliootus.biblioconfig;
 
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 public class QuizShellPromptProvider implements PromptProvider {
     @Override
     public AttributedString getPrompt() {
-        return new AttributedString("quiz:>", AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN));
+        return new AttributedString("bibliootus:>", AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN));
     }
 }

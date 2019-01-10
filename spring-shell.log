@@ -23,3 +23,91 @@
 1545654717999:exit
 1545655138976:help
 1545655248140:exit
+1546446312749:help
+1546446335384:show-books
+1546446352770:show-books 1
+1546446362268:quit
+1546449314035:help
+1546449330875:show-book
+1546449341388:show-books
+1546449620470:show-books 1
+1546449640778:quit
+1546450096360:help
+1546450113591:books-with-genre -id 3
+1546450142771:books-with-genre -id 2
+1546450455233:books-with-genre
+1546450476791:books-with-author
+1546450517797:book-with-author 2 hhh
+1546450531153:help
+1546450572565:books-with-author 1
+1546450595528:books-with-author hhhh
+1546451040211:help
+1546451065517:books-by-author-id -id 3
+1546451092730:books-by-author-id
+1546451106742:books-by-author-name vasya
+1546452073159:books-by-author-id eee
+1546452194162:books-by-author-id 111111111111
+1546452307659:books-by-author-id q
+1546452333591:books-bauthor-id 1
+1546452353367:books-by-author-id 1
+1546452862151:help
+1546452925355:add-book My perfect book, 3, 4, 5, 6
+1546453190746:help
+1546453223144:add-book "My perfect book" 2 3 4 5 6 9
+1546453248529:add-book "My perfect book" 2 3
+1546453285427:add-book "My book" 3 1 2
+1546453525693:help
+1546453560544:add-book "My book" -gid 2 -aid 2 3
+1546453609845:help add-book
+1546453804760:add-book "My book" 2 -aid 2
+1546454075071:add-book "My book" 3 4
+1546454669263:help
+1546454702099:update-book-genre -bid 1 -gid 2
+1546455265312:help
+1546455290119:add-author-to-book 1 4
+1546455966460:help
+1546455985956:del-author-from-book 1 1
+1546456488334:help
+1546456509766:find-book-by-name kuku
+1546456539916:find-books-by-name "ku ku vasya"
+1546457478568:help
+1546457494158:show-authors
+1546457508561:show-authors 2
+1547041141237:help
+1547041158889:show-books
+1547041181024:exit
+1547041343552:show-book
+1547041351269:help
+1547041361860:show-books
+1547041569567:help
+1547041621477:help add-book
+1547041646284:show-genres
+1547041654454:show-authors
+1547041694101:add-book "12 СТУЛЬЕВ" 2 2
+1547041723141:help
+1547041744432:show-books
+1547041772395:help add-author-to-book
+1547041809902:add-author-to-book 3 1
+1547041815947:help
+1547041841628:find-book-by-name 12
+1547041865873:find-books-by-name 12
+1547041893913:del-author-from-book 3 1
+1547041916017:add-author-to-book 3 3
+1547041931795:help
+1547041996748:books-by-author-name ильф
+1547042017228:рудз
+1547042020493:help
+1547042063186:help books-with-genre
+1547042097272:books-with-genre
+1547042114892:books-with-genre 1
+1547042454986:help
+1547042477294:books-with-genre
+1547042485198:books-with-genre 1
+1547042490415:books-with-genre 2
+1547042494696:books-with-genre 3
+1547042511801:help
+1547042526188:help add-author
+1547042571615:add-author "КОРНЕЙ ЧУКОВСКИЙ"
+1547042582644:show-authors
+1547042600311:del-author 5
+1547042607060:show-authors
