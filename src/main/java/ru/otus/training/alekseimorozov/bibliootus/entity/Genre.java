@@ -1,7 +1,28 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
-public class Genre extends CommonEntity {
+import java.io.Serializable;
+
+public class Genre implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private Long id;
+    private String name;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @Override
     public String toString() {
@@ -17,16 +38,16 @@ public class Genre extends CommonEntity {
             return false;
         }
         Genre genre = (Genre) o;
-        if (getName() == null && genre.getName() == null) {
-            return getId() == genre.getId();
+        if (name == null && genre.name == null) {
+            return id == genre.id;
         }
-        return getId() == genre.getId() && getName() != null && getName().equals(genre.getName());
+        return id == genre.id && name != null && name.equals(genre.name);
     }
 
     @Override
     public int hashCode() {
-        int result = 31 * 19 + (int) (getId() ^ (getId() >>> 32));
-        return getName() == null ? result : 31 * result + getName().hashCode();
+        int result = 31 * 19 + (int) (id ^ (id >>> 32));
+        return name == null ? result : 31 * result + name.hashCode();
     }
 
     public static Genre getGenre(Long id, String name) {

@@ -1,16 +1,15 @@
-package ru.otus.training.alekseimorozov.bibliootus.businesslogic.service;
+package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.training.alekseimorozov.bibliootus.CommonTest;
 import ru.otus.training.alekseimorozov.bibliootus.dao.AuthorDao;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-public class AccountServiceImplTest extends CommonTest {
+public class AccountServiceImplServiceTest extends CommonServiceTest {
     @MockBean
     private AuthorDao authorDao;
     @Autowired
@@ -20,7 +19,7 @@ public class AccountServiceImplTest extends CommonTest {
     public void createTest() {
         String testName = "Author Name";
         Author expectedAuthor = new Author();
-        expectedAuthor.setName(testName);
+        expectedAuthor.setFullName(testName);
         Author actualAuthor = authorService.create(testName);
         verify(authorDao).create(expectedAuthor);
         assertEquals(expectedAuthor, actualAuthor);

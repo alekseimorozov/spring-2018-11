@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.bibliootus.businesslogic.service;
+package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 

@@ -2,11 +2,9 @@ package ru.otus.training.alekseimorozov.bibliootus.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import ru.otus.training.alekseimorozov.bibliootus.CommonTest;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 
 import java.util.ArrayList;
@@ -17,16 +15,15 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.otus.training.alekseimorozov.bibliootus.entity.Author.getAuthor;
 
-class AuthorDaoJdbcTest extends CommonTest {
-    private static final String SELECT_AUTHOR = "SELECT * FROM AUTHORS WHERE id = :id and name = :name";
-    private static final String SELECT_NAME = "SELECT name FROM AUTHORS WHERE id = :id";
+class AuthorDaoJdbcTest extends CommonDaoJdbcTest {
+    private static final String SELECT_AUTHOR = "SELECT * FROM AUTHORS WHERE id = :id and full_name = :fullName";
+    private static final String SELECT_NAME = "SELECT full_name FROM AUTHORS WHERE id = :id";
     private static final String SELECT_BY_ID = "SELECT * FROM AUTHORS WHERE id = :id";
-    private static final String INSERT_AUTHOR = "INSERT INTO AUTHORS (ID, NAME) VALUES(:id, :name)";
+    private static final String INSERT_AUTHOR = "INSERT INTO AUTHORS (ID, FULL_NAME) VALUES(:id, :fullName)";
     private static final String INSERT_AUTHOR_BOOK_MAP = "INSERT INTO AUTHOR_TO_BOOK_MAP(AUTHOR_ID, BOOK_ID) " +
             "VALUES(:authorId, :bookId)";
     private static final String CLEAR_TABLES = "DELETE FROM AUTHOR_TO_BOOK_MAP; DELETE FROM AUTHORS";
 
-    @Autowired
     private AuthorDao authorDao;
 
     @BeforeEach
@@ -46,16 +43,17 @@ class AuthorDaoJdbcTest extends CommonTest {
         params[1].put("authorId", 3L);
         params[1].put("bookId", 2L);
         getJdbc().batchUpdate(INSERT_AUTHOR_BOOK_MAP, params);
+        authorDao = new AuthorDaoJdbc(getJdbc());
     }
 
     @Test
     void create() {
         Author expectedAuthor = new Author();
-        expectedAuthor.setName("Author Test");
+        expectedAuthor.setFullName("Author Test");
         authorDao.create(expectedAuthor);
         SqlParameterSource params = new BeanPropertySqlParameterSource(expectedAuthor);
         Author actualAuthor = getJdbc().queryForObject(SELECT_AUTHOR, params, (resultSet, i) ->
-                getAuthor(resultSet.getLong("id"), resultSet.getString("name")));
+                getAuthor(resultSet.getLong("id"), resultSet.getString("full_name")));
         assertEquals(expectedAuthor, actualAuthor);
     }
 

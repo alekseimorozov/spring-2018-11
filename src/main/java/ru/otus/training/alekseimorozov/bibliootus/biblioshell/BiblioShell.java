@@ -1,207 +1,198 @@
 package ru.otus.training.alekseimorozov.bibliootus.biblioshell;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import ru.otus.training.alekseimorozov.bibliootus.businesslogic.BiblioRunner;
-import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.AuthorService;
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.BookService;
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.GenreService;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
-import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
-import java.util.List;
+import static ru.otus.training.alekseimorozov.bibliootus.entity.EntityPrinter.*;
 
 @ShellComponent
 public class BiblioShell {
-    private BiblioRunner runner;
+    private static final String ERR_MSG = "%1$s WASN'T REMOVED DUE TO SOME BOOKS HAVE LINK TO THIS %1$s \n" +
+            "REMOVE %1$s FROM THE BOOKS FIRST";
+
+    private AuthorService authorService;
+    private GenreService genreService;
+    private BookService bookService;
 
     @Autowired
-    public BiblioShell(BiblioRunner runner) {
-        this.runner = runner;
+    public BiblioShell(AuthorService authorService, GenreService genreService, BookService bookService) {
+        this.authorService = authorService;
+        this.genreService = genreService;
+        this.bookService = bookService;
     }
 
     @ShellMethod("Show list of all books or book with given id")
-    public void showBooks(@ShellOption(defaultValue = "0") Long bookId) {
+    public String showBooks(@ShellOption(defaultValue = "0") Long bookId) {
         if (bookId == 0) {
-            printAllBooks(runner.showAllBooks());
+            return printAllBooks(bookService.readAll());
         } else {
-            printBook(runner.findBookById(bookId));
+            return String.format("show book with id: %d \n", bookId) + printBook(bookService.readById(bookId));
         }
     }
 
     @ShellMethod(value = "Find books by part of name")
-    public void findBooksByName(@ShellOption(value = {"-name", "--name"}, defaultValue = "") String name) {
+    public String findBooksByName(@ShellOption(value = {"-name", "--name"}, defaultValue = "") String name) {
         if (name.isEmpty()) {
-            printAllBooks(runner.showAllBooks());
+            return printAllBooks(bookService.readAll());
         } else {
-            printAllBooks(runner.findBooksByName(name));
+            return String.format("find book by part of name: %s \n", name) + printAllBooks(bookService.findByName(name));
         }
     }
 
     @ShellMethod(value = "Show list of books with certain genre", key = "books-with-genre")
-    public void showBooksWithGenre(@ShellOption(value = {"-id", "--id"}, defaultValue = "0") Long genreId) {
+    public String showBooksWithGenre(@ShellOption(value = {"-id", "--id"}, defaultValue = "0") Long genreId) {
         if (genreId > 0) {
-            printAllBooks(runner.findBooksByGenre(genreId));
+            return printAllBooks(bookService.findByGenreId(genreId));
         } else {
-            printAllBooks(runner.showAllBooks());
+            return printAllBooks(bookService.readAll());
         }
     }
 
     @ShellMethod(value = "Show list of books with certain author", key = "books-by-author-id")
-    public void findBooksByAuthorId(@ShellOption(value = {"-id", "--id"}, defaultValue = "0") Long authorId) {
+    public String findBooksByAuthorId(@ShellOption(value = {"-id", "--id"}, defaultValue = "0") Long authorId) {
         if (authorId > 0) {
-            printAllBooks(runner.findBooksByAuthorId(authorId));
+            return printAllBooks(bookService.findByAuthorId(authorId));
         } else {
-            printAllBooks(runner.showAllBooks());
+            return printAllBooks(bookService.readAll());
         }
     }
 
     @ShellMethod(value = "Show list of books with certain author", key = "books-by-author-name")
-    public void findBooksByAuthorName(@ShellOption(value = {"-name", "--name"}, defaultValue = "") String authorName) {
+    public String findBooksByAuthorName(@ShellOption(value = {"-name", "--name"}, defaultValue = "") String authorName) {
         if (authorName.isEmpty()) {
-            printAllBooks(runner.showAllBooks());
+            return printAllBooks(bookService.readAll());
         } else {
-            printAllBooks(runner.findBooksByAuthorName(authorName));
+            return String.format("show all books with Author's part of name: %s \n", authorName) + printAllBooks(bookService.findByAuthorName(authorName));
         }
     }
 
     @ShellMethod("Add new book to library")
-    public void addBook(@ShellOption(value = {"-name", "--name"}, help = "define name of book") String bookName,
-                        @ShellOption(value = {"-gid", "--gid"}, help = "define id of genre") Long genreId,
-                        @ShellOption(value = {"-aid", "--aid"}, help = "define author's id") Long authorId) {
-        printBook(runner.addBook(bookName, genreId, authorId));
+    public String addBook(@ShellOption(value = {"-title", "--title"}, help = "define title of book") String title,
+                          @ShellOption(value = {"-gid", "--gid"}, help = "define id of genre", defaultValue = "0") Long genreId,
+                          @ShellOption(value = {"-aid", "--aid"}, help = "define author's id", defaultValue = "0") Long authorId) {
+        Book book = new Book();
+        book.setTitle(title);
+        if (genreId > 0) {
+            book.setGenre(genreService.readById(genreId));
+        }
+        if (authorId > 0) {
+            book.getAuthors().add(authorService.findById(authorId));
+        }
+        return "book was added \n" + printBook(bookService.create(book));
     }
 
     @ShellMethod("Update genre of book")
-    public void updateBookGenre(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
-                                @ShellOption(value = {"-gid", "--gid"}, help = "define id of new genre") Long genreId) {
-        runner.updateBookGenre(bookId, genreId);
-        System.out.println("Book genre was updated");
+    public String updateBookGenre(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
+                                  @ShellOption(value = {"-gid", "--gid"}, help = "define id of new genre") Long genreId) {
+        bookService.updateBookGenre(bookId, genreId);
+        return "Book genre was updated";
     }
 
-    @ShellMethod("Update name of book")
-    public void updateBookName(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
-                               @ShellOption(value = {"-name", "--name"}) String name) {
-        runner.updateBookName(bookId, name);
-        System.out.println("Book name was updated");
+    @ShellMethod("Update title of book")
+    public String updateBookTitle(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
+                                 @ShellOption(value = {"-title", "--title"}) String title) {
+        bookService.updateBookName(bookId, title);
+        return "Book name was updated";
     }
 
     @ShellMethod("Add new author to book's list of authors")
-    public void addAuthorToBook(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
-                                @ShellOption(value = {"-aid", "--aid"}, help = "define id of author to add") Long authorId) {
-        runner.addAuthorToBook(bookId, authorId);
-        System.out.println("Author was added to book");
+    public String addAuthorToBook(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
+                                  @ShellOption(value = {"-aid", "--aid"}, help = "define id of author to add") Long authorId) {
+        bookService.addAuthorToBook(bookId, authorId);
+        return "Author was added to book";
     }
 
     @ShellMethod("Remove author from book's list of authors")
-    public void delAuthorFromBook(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
-                                  @ShellOption(value = {"-aid", "--aid"}, help = "define id of author to remove") Long authorId) {
-        runner.delAuthorFromBook(bookId, authorId);
-        System.out.println("Author was removed from book");
+    public String delAuthorFromBook(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
+                                    @ShellOption(value = {"-aid", "--aid"}, help = "define id of author to remove") Long authorId) {
+        bookService.removeAuthorFromBook(bookId, authorId);
+        return "Author was removed from book";
     }
 
     @ShellMethod(value = "Remove book from library", key = "del-book")
-    public void deleteBook(@ShellOption(value = {"-id", "--id"}, help = "define id of book") Long id) {
-        runner.deleteBook(id);
-        System.out.println("Book was removed");
+    public String deleteBook(@ShellOption(value = {"-id", "--id"}, help = "define id of book") Long id) {
+        bookService.delete(id);
+        return "Book was removed";
     }
 
     @ShellMethod(value = "Show all authors or author with certain ID")
-    public void showAuthors(@ShellOption(defaultValue = "0") Long id) {
+    public String showAuthors(@ShellOption(defaultValue = "0") Long id) {
         if (id > 0) {
-            printAuthor(runner.findAuthorById(id));
+            return printAuthor(authorService.findById(id));
         } else {
-            printAllAuthors(runner.showAllAuthors());
+            return printAllAuthors(authorService.readAll());
         }
     }
 
     @ShellMethod(value = "Find authors by part of name")
-    public void findAuthorsByName(@ShellOption(defaultValue = "") String name) {
+    public String findAuthorsByName(@ShellOption(defaultValue = "") String name) {
         if (name.isEmpty()) {
-            printAllAuthors(runner.showAllAuthors());
+            return printAllAuthors(authorService.readAll());
         } else {
-            printAllAuthors(runner.findAuthorByName(name));
+            return printAllAuthors(authorService.findByName(name));
         }
     }
 
 
     @ShellMethod("Add new author to library")
-    public void addAuthor(String name) {
-        runner.addAuthor(name);
-        System.out.println("New author was added");
+    public String addAuthor(String name) {
+        authorService.create(name);
+        return "New author was added";
     }
 
     @ShellMethod("Remove author from library")
-    public void delAuthor(Long id) {
-        runner.deleteAuthor(id);
-        System.out.println("Author was removed");
+    public String delAuthor(Long id) {
+        try {
+            authorService.delete(id);
+            return "Author was removed";
+        } catch (DataIntegrityViolationException e) {
+            return String.format(ERR_MSG, "AUTHOR");
+        }
     }
 
-    @ShellMethod("Add new author to library")
-    public void updateAuthor(@ShellOption(help = "id of authors, which will be updated") Long id,
-                             @ShellOption(help = "new author's name") String name) {
-        runner.updateAuthor(id, name);
-        System.out.println("author was updated");
+    @ShellMethod("Update author's name")
+    public String updateAuthor(@ShellOption(help = "id of authors, which will be updated") Long id,
+                               @ShellOption(help = "new author's name") String name) {
+        authorService.update(id, name);
+        return "author was updated";
     }
 
     @ShellMethod("Add new genre to library")
-    public void addGenre(String name) {
-        runner.addGenre(name);
-        System.out.println("new genre was added");
+    public String addGenre(String name) {
+        genreService.create(name);
+        return "new genre was added";
     }
 
     @ShellMethod("Show all genres in library")
-    public void showGenres() {
-        printAllGenre(runner.showAllGenres());
+    public String showGenres(@ShellOption(defaultValue = "0") Long id) {
+        if (id > 0) {
+            return printGenre(genreService.readById(id));
+        } else {
+            return printAllGenre(genreService.readAll());
+        }
     }
 
     @ShellMethod("Remove genre from library")
-    public void delGenre(Long id) {
-        runner.deleteGenre(id);
-        System.out.println("genre was deleted");
+    public String delGenre(Long id) {
+        try {
+            genreService.delete(id);
+            return "genre was deleted";
+        } catch (DataIntegrityViolationException e) {
+            return String.format(ERR_MSG, "GENRE");
+        }
     }
 
     @ShellMethod("Update genre")
     public void updateGenre(@ShellOption(help = "id of genre, wich will be updated") Long id, @ShellOption(help =
             "new name of genre") String name) {
-        runner.updateGenre(id, name);
+        genreService.update(id, name);
         System.out.println("Genre was updated");
-    }
-
-    private void printAllBooks(List<Book> books) {
-        for (Book book : books) {
-            printBook(book);
-        }
-    }
-
-    private void printBook(Book book) {
-        if (book != null) {
-            System.out.println(book);
-        } else {
-            System.out.println("Book was not found");
-        }
-        System.out.println("------------------------");
-    }
-
-    private void printAllAuthors(List<Author> authors) {
-        for (Author author : authors) {
-            printAuthor(author);
-        }
-    }
-
-    private void printAuthor(Author author) {
-        System.out.println(author);
-        System.out.println("------------------------");
-    }
-
-    private void printAllGenre(List<Genre> genres) {
-        for (Genre genre : genres) {
-            printGenre(genre);
-        }
-    }
-
-    private void printGenre(Genre genre) {
-        System.out.println(genre);
-        System.out.println("------------------------");
     }
 }

@@ -2,10 +2,8 @@ package ru.otus.training.alekseimorozov.bibliootus.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import ru.otus.training.alekseimorozov.bibliootus.CommonTest;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
 import java.util.ArrayList;
@@ -15,17 +13,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.otus.training.alekseimorozov.bibliootus.entity.Genre.getGenre;
 
-class GenreDaoJdbcTest extends CommonTest {
+class GenreDaoJdbcTest extends CommonDaoJdbcTest {
     private static final String SELECT_GENRE = "SELECT * FROM GENRES WHERE id = :id AND name = :name";
     private static final String SELECT_THIRD = "SELECT name FROM GENRES WHERE id = 3";
 
-    @Autowired
     private GenreDao genreDao;
 
     @BeforeEach
     public void prepareTable() {
         getJdbc().update("DELETE FROM GENRES WHERE id > 2", new HashMap<>());
         getJdbc().update("INSERT INTO GENRES (ID, NAME) VALUES(3, 'ТЕХНИЧЕСКАЯ')", new HashMap<>());
+        genreDao = new GenreDaoJdbc(getJdbc());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.bibliootus.businesslogic.service;
+package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Author create(String name) {
         Author author = new Author();
-        author.setName(name);
+        author.setFullName(name);
         authorDao.create(author);
         return author;
     }

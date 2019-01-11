@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.bibliootus.businesslogic.service;
+package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,6 @@ package ru.otus.training.alekseimorozov.bibliootus.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -12,27 +11,35 @@ import org.springframework.stereotype.Repository;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static ru.otus.training.alekseimorozov.bibliootus.entity.Author.getAuthor;
 import static ru.otus.training.alekseimorozov.bibliootus.entity.Genre.getGenre;
 
 @Repository
 public class BookDaoJdbc implements BookDao {
-    private static final String READ_ALL = "SELECT b.id as id, b.name as name, g.id as genre_id, g.name as " +
-            "genre_name FROM BOOKS b JOIN GENRES g ON g.id = b.genre_id ";
-    private static final String CREATE_BOOK = "INSERT INTO BOOKS (NAME, GENRE_ID) VALUES (:name, :genreId)";
+    private static final String EAGER_READ_ALL = "WITH author_to_book AS (SELECT book_id, author_id, full_name " +
+            "FROM author_to_book_map m JOIN authors a ON m.author_id = a.id) " +
+            "SELECT b.id AS id, title, genre_id, name, author_id, full_name " +
+            "FROM books b JOIN genres g ON g.id = b.genre_id " +
+            "LEFT JOIN author_to_book ab ON ab.book_id = b.id";
+    private static final String CREATE_BOOK = "INSERT INTO BOOKS (TITLE, GENRE_ID) VALUES (:title, :genreId)";
     private static final String ADD_AUTHOR = "INSERT INTO AUTHOR_TO_BOOK_MAP (AUTHOR_ID, BOOK_ID)" +
             "VALUES(:authorId, :bookId)";
-    private static final String READ_BY_ID = READ_ALL + " WHERE b.id = :id";
-    private static final String SELECT_BY_NAME = READ_ALL + " WHERE UPPER(b.name) LIKE '%'||:name||'%'";
-    private static final String SELECT_BY_AUTHOR_NAME = READ_ALL + " WHERE b.id IN " +
+    private static final String READ_BY_ID = EAGER_READ_ALL + " WHERE b.id = :id";
+    private static final String SELECT_BY_NAME = EAGER_READ_ALL + "   WHERE UPPER(b.title) LIKE '%'||:title||'%'";
+    private static final String SELECT_BY_AUTHOR_NAME = EAGER_READ_ALL + " WHERE b.id IN " +
             "(SELECT BOOK_ID FROM AUTHOR_TO_BOOK_MAP WHERE AUTHOR_ID IN " +
-            "(SELECT A.ID FROM AUTHORS A WHERE UPPER(A.NAME) LIKE '%'||:name||'%'))";
-    private static final String SELECT_BY_AUTHOR_ID = READ_ALL + " WHERE b.id IN " +
+            "(SELECT A.ID FROM AUTHORS A WHERE UPPER(A.FULL_NAME) LIKE '%'||:name||'%'))";
+    private static final String SELECT_BY_AUTHOR_ID = EAGER_READ_ALL + " WHERE b.id IN " +
             "(SELECT BOOK_ID FROM AUTHOR_TO_BOOK_MAP WHERE AUTHOR_ID = :id)";
-    private static final String SELECT_BY_GENRE_ID = READ_ALL + " WHERE g.id = :id";
-    private static final String UPDATE_NAME = "UPDATE BOOKS SET NAME = :name WHERE id = :id";
+    private static final String SELECT_BY_GENRE_ID = EAGER_READ_ALL + " WHERE g.id = :id";
+    private static final String UPDATE_NAME = "UPDATE BOOKS SET title = :title WHERE id = :id";
     private static final String UPDATE_GENRE = "UPDATE BOOKS SET genre_id = :genreId WHERE id = :bookId";
     private static final String DELETE_AUTHOR = "DELETE FROM AUTHOR_TO_BOOK_MAP WHERE AUTHOR_ID = :authorId AND " +
             "BOOK_ID = :bookId";
@@ -40,27 +47,40 @@ public class BookDaoJdbc implements BookDao {
     private static final String DELETE_BOOK = "DELETE FROM BOOKS WHERE ID = :bookId";
 
     private NamedParameterJdbcOperations jdbc;
-    private ResultSetExtractor<Book> bookResultSetExtractor;
-    private RowMapper<Book> bookRowMapper;
+    private ResultSetExtractor<Book> bookExtractor;
+    private ResultSetExtractor<List<Book>> eagerBooksExtractor;
 
     @Autowired
     public BookDaoJdbc(NamedParameterJdbcOperations jdbc) {
         this.jdbc = jdbc;
-        bookResultSetExtractor = (resultSet) -> {
-            Book book = new Book();
-            if (resultSet.next()) {
-                book.setId(resultSet.getLong("id"));
-                book.setName(resultSet.getString("name"));
-                book.setGenre(getGenre(resultSet.getLong("genre_id"), resultSet.getString("genre_name")));
+        bookExtractor = (resultSet) -> {
+            Book book = null;
+            while (resultSet.next()) {
+                if (book == null) {
+                    book = new Book();
+                    book.setId(resultSet.getLong("id"));
+                    book.setTitle(resultSet.getString("title"));
+                    book.setGenre(getGenre(resultSet.getLong("genre_id"), resultSet.getString("name")));
+                }
+                book.getAuthors().add(getAuthor(resultSet.getLong("author_id"), resultSet.getString("full_name")));
             }
-            return book;
+            return book == null ? new Book() : book;
         };
-        bookRowMapper = (resultSet, i) -> {
-            Book book = new Book();
-            book.setId(resultSet.getLong("id"));
-            book.setName(resultSet.getString("name"));
-            book.setGenre(getGenre(resultSet.getLong("genre_id"), resultSet.getString("genre_name")));
-            return book;
+        eagerBooksExtractor = (resultSet) -> {
+            Map<Long, Book> books = new HashMap<>();
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                Book book = books.get(id);
+                if (book == null) {
+                    book = new Book();
+                    book.setId(id);
+                    book.setTitle(resultSet.getString("title"));
+                    book.setGenre(getGenre(resultSet.getLong("genre_id"), resultSet.getString("name")));
+                    books.put(id, book);
+                }
+                book.getAuthors().add(getAuthor(resultSet.getLong("author_id"), resultSet.getString("full_name")));
+            }
+            return new ArrayList<>(books.values());
         };
     }
 
@@ -68,7 +88,7 @@ public class BookDaoJdbc implements BookDao {
     public Book create(Book book) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource params = new MapSqlParameterSource().
-                addValue("name", book.getName()).
+                addValue("title", book.getTitle()).
                 addValue("genreId", book.getGenre().getId());
         jdbc.update(CREATE_BOOK, params, keyHolder);
         book.setId(keyHolder.getKey().longValue());
@@ -83,64 +103,55 @@ public class BookDaoJdbc implements BookDao {
 
     @Override
     public List<Book> readAll() {
-        return jdbc.query(READ_ALL, bookRowMapper);
+        return jdbc.query(EAGER_READ_ALL, eagerBooksExtractor);
     }
 
     @Override
     public Book readById(Long id) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
-        return jdbc.query(READ_BY_ID, params, bookResultSetExtractor);
+        return jdbc.query(READ_BY_ID, new MapSqlParameterSource().addValue("id", id), bookExtractor);
     }
 
     @Override
     public List<Book> findByName(String name) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("name", name.toUpperCase());
-        return jdbc.query(SELECT_BY_NAME, params, bookRowMapper);
+        return jdbc.query(SELECT_BY_NAME, new MapSqlParameterSource().addValue("title", name.toUpperCase()),
+                eagerBooksExtractor);
     }
 
     @Override
     public List<Book> findByAuthorName(String name) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("name", name.toUpperCase());
-        return jdbc.query(SELECT_BY_AUTHOR_NAME, params, bookRowMapper);
+        return jdbc.query(SELECT_BY_AUTHOR_NAME, new MapSqlParameterSource().addValue("name", name.toUpperCase()),
+                eagerBooksExtractor);
     }
 
     @Override
     public List<Book> findByAuthorId(Long id) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
-        return jdbc.query(SELECT_BY_AUTHOR_ID, params, bookRowMapper);
+        return jdbc.query(SELECT_BY_AUTHOR_ID, new MapSqlParameterSource().addValue("id", id), eagerBooksExtractor);
     }
 
     @Override
     public List<Book> findByGenreId(Long id) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
-        return jdbc.query(SELECT_BY_GENRE_ID, params, bookRowMapper);
+        return jdbc.query(SELECT_BY_GENRE_ID, new MapSqlParameterSource().addValue("id", id), eagerBooksExtractor);
     }
 
     @Override
-    public void updateBookName(Long id, String name) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("id", id).
-                addValue("name", name);
-        jdbc.update(UPDATE_NAME, params);
+    public void updateBookName(Long id, String title) {
+        jdbc.update(UPDATE_NAME, new MapSqlParameterSource().addValue("id", id).addValue("title", title));
     }
 
     @Override
     public void updateBookGenre(Long bookId, Long genreId) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("bookId", bookId).addValue("genreId", genreId);
-        jdbc.update(UPDATE_GENRE, params);
+        jdbc.update(UPDATE_GENRE, new MapSqlParameterSource().addValue("bookId", bookId).addValue("genreId", genreId));
     }
 
     @Override
     public void addAuthorToBook(Long bookId, Long authorId) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("bookId", bookId).
-                addValue("authorId", authorId);
-        jdbc.update(ADD_AUTHOR, params);
+        jdbc.update(ADD_AUTHOR, new MapSqlParameterSource().addValue("bookId", bookId).addValue("authorId", authorId));
     }
 
     @Override
     public void removeAuthorFromBook(Long bookId, Long authorId) {
-        SqlParameterSource params = new MapSqlParameterSource().addValue("bookId", bookId).
-                addValue("authorId", authorId);
-        jdbc.update(DELETE_AUTHOR, params);
+        jdbc.update(DELETE_AUTHOR, new MapSqlParameterSource().addValue("bookId", bookId).
+                addValue("authorId", authorId));
     }
 
     @Override

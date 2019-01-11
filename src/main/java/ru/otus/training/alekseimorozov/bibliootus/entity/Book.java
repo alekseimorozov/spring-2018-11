@@ -1,11 +1,31 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Book extends CommonEntity {
+public class Book implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private Long id;
+    private String title;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     private List<Author> authors = new ArrayList<>();
     private Genre genre;
@@ -29,7 +49,7 @@ public class Book extends CommonEntity {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("Book name: ").append(getName()).append("(id: ").append(getId()).append(")\n")
+        result.append("Book title: ").append(title).append("(id: ").append(id).append(")\n")
                 .append("genre: ").append(genre).append("\n")
                 .append("authors: ").append("\n");
         for (Author author : authors) {
@@ -47,8 +67,7 @@ public class Book extends CommonEntity {
             return false;
         }
         Book book = (Book) o;
-        boolean namesIsEqual = getName() == null && book.getName() == null ? true :
-                getName() != null && getName().equals(book.getName());
+        boolean namesIsEqual = title == null && book.title == null ? true : title != null && title.equals(book.title);
         boolean genreIsEquals = genre == null && book.genre == null ? true : genre != null && genre.equals(book.genre);
         boolean authorsIsEqueal = Arrays.equals(authors.toArray(), book.authors.toArray());
         return getId() == book.getId() && namesIsEqual && genreIsEquals && authorsIsEqueal;
@@ -56,7 +75,10 @@ public class Book extends CommonEntity {
 
     @Override
     public int hashCode() {
-        int result = 31 * 19 + (int) (getId() ^ (getId() >>> 32));
-        return getName() == null ? result : 31 * result + getName().hashCode();
+        int result = 31 * 19 + (int) (id ^ (id >>> 32));
+        if (title != null) {
+            result = 31 * result + title.hashCode();
+        }
+        return genre == null ? result : 31 * result + genre.hashCode();
     }
 }
