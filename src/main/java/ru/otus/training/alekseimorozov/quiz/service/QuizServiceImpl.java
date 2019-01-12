@@ -20,5 +20,4 @@ public class QuizServiceImpl implements QuizService {
     public List<Question> getQuizQuestions(String fileName) {
         return questionDao.findAll(fileName);
     }
-
 }

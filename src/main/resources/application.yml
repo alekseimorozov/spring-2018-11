@@ -1,6 +1,6 @@
 spring:
   banner:
-      location: banner/banner.txt
+    location: banner/banner.txt
   output:
     ansi:
       enabled: ALWAYS

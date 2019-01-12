@@ -4,6 +4,7 @@ import org.junit.Test;
 import ru.otus.training.alekseimorozov.quiz.entity.Answer;
 import ru.otus.training.alekseimorozov.quiz.entity.Question;
 import ru.otus.training.alekseimorozov.quiz.entity.QuizException;
+
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
