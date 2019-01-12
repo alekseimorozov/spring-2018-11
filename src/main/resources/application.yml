@@ -1,25 +1,6 @@
 spring:
   banner:
-    location: banner/banner.txt
+    location: banner/practicelibBanner.txt
   output:
     ansi:
       enabled: ALWAYS
-quiz:
-  sources:
-    ru_RU: ruquestions.csv
-    en_US: enquestions.csv
-    es_ES: esquestions.csv
-    default: ruquestions.csv
-  languages:
-    0:
-      0: Default
-      1: ru-RU
-    1:
-      0: Русский
-      1: ru-RU
-    2:
-      0: English
-      1: en-US
-    3:
-      0: Español
-      1: es-ES

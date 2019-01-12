@@ -1,0 +1,7 @@
+${Ansi.RED} _______  _______  _______  _______  _______  _______  _______  _______  _______  _______
+${Ansi.RED}|\     /||\     /||\     /||\     /||\     /||\     /||\     /||\     /||\     /||\     /|
+${Ansi.RED}| +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ |
+${Ansi.RED}| |   | || |   | || |   | || |   | || |   | || |   | || |   | || |   | || |   | || |   | |
+${Ansi.RED}| |${AnsiColor.WHITE}B  ${Ansi.RED}| || |${AnsiColor.WHITE}I  ${Ansi.RED}| || |${AnsiColor.WHITE}B  ${Ansi.RED}| || |${AnsiColor.WHITE}L  ${Ansi.RED}| || |${AnsiColor.WHITE}I  ${Ansi.RED}| || |${AnsiColor.WHITE}O  ${Ansi.RED}| || |${AnsiColor.WHITE}O  ${Ansi.RED}| || |${AnsiColor.WHITE}T  ${Ansi.RED}| || |${AnsiColor.WHITE}U  ${Ansi.RED}| || |${AnsiColor.WHITE}S  ${Ansi.RED}| |
+${Ansi.RED}| +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ || +---+ |
+${Ansi.RED}|/_____\||/_____\||/_____\||/_____\||/_____\||/_____\||/_____\||/_____\||/_____\||/_____\|
