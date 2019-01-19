@@ -1,12 +1,26 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
+@Entity
+@Table(name = "genres")
 public class Genre implements Serializable {
+    @Transient
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue
     private Long id;
     private String name;
+
+    public Genre() {
+    }
+
+    public Genre(String name) {
+        this.name = name;
+    }
 
     public Long getId() {
         return id;
@@ -41,13 +55,12 @@ public class Genre implements Serializable {
         if (name == null && genre.name == null) {
             return id == genre.id;
         }
-        return id == genre.id && name != null && name.equals(genre.name);
+        return Objects.equals(id, genre.id) && Objects.equals(name, genre.name);
     }
 
     @Override
     public int hashCode() {
-        int result = 31 * 19 + (int) (id ^ (id >>> 32));
-        return name == null ? result : 31 * result + name.hashCode();
+        return Objects.hash(id, name);
     }
 
     public static Genre getGenre(Long id, String name) {

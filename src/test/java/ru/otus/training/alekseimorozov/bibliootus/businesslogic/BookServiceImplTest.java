@@ -3,12 +3,13 @@ package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import ru.otus.training.alekseimorozov.bibliootus.CommonTest;
 import ru.otus.training.alekseimorozov.bibliootus.dao.BookDao;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 
 import static org.mockito.Mockito.verify;
 
-class BookServiceImplServiceTest extends CommonServiceTest {
+class BookServiceImplTest extends CommonTest {
     @MockBean
     private BookDao bookDao;
     @Autowired

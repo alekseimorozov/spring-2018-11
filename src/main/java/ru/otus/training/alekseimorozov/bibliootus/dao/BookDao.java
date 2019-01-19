@@ -27,5 +27,7 @@ public interface BookDao {
 
     void removeAuthorFromBook(Long bookId, Long authorId);
 
+    void update(Book book);
+
     void delete(Long id);
 }

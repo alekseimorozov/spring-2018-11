@@ -3,12 +3,13 @@ package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import ru.otus.training.alekseimorozov.bibliootus.CommonTest;
 import ru.otus.training.alekseimorozov.bibliootus.dao.GenreDao;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
 import static org.mockito.Mockito.verify;
 
-public class GenreServiceImplServiceTest extends CommonServiceTest {
+public class GenreServiceImplTest extends CommonTest {
     @MockBean
     private GenreDao genreDao;
     @Autowired

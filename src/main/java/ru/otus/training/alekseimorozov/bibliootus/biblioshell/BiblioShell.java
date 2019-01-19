@@ -6,9 +6,13 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.AuthorService;
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.BookCommentService;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.BookService;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.GenreService;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
+import ru.otus.training.alekseimorozov.bibliootus.entity.BookComment;
+
+import java.util.List;
 
 import static ru.otus.training.alekseimorozov.bibliootus.entity.EntityPrinter.*;
 
@@ -20,6 +24,7 @@ public class BiblioShell {
     private AuthorService authorService;
     private GenreService genreService;
     private BookService bookService;
+    private BookCommentService bookCommentService;
 
     @Autowired
     public BiblioShell(AuthorService authorService, GenreService genreService, BookService bookService) {
@@ -120,6 +125,46 @@ public class BiblioShell {
     public String deleteBook(@ShellOption(value = {"-id", "--id"}, help = "define id of book") Long id) {
         bookService.delete(id);
         return "Book was removed";
+    }
+
+    @ShellMethod(value = "add comment tu book")
+    public String addComment(@ShellOption(help = "define id of book") Long bookId,
+                           @ShellOption(value = {"-c", "--c"}, help = "text of comment") String comment) {
+        bookCommentService.addComment(bookId, comment);
+        return  "Comment saved";
+    }
+
+    @ShellMethod(value = "show all comments or comment for required id")
+    public String showComment(@ShellOption(defaultValue = "0") Long id) {
+        if (id == 0) {
+            return printAllComments(bookCommentService.readAll());
+        } else {
+            return printComment(bookCommentService.readById(id))
+        }
+    }
+
+    @ShellMethod(value = "show all comments for book with required id")
+    public String showCommentForBook(Long id) {
+            return printComment(bookCommentService.readByBookId(id))
+    }
+
+    @ShellMethod(value = "update text of comment")
+    public String updateCommentText(Long id, String text) {
+        bookCommentService.updateText(id ,text);
+        return "Comment was updated";
+    }
+
+    @ShellMethod(value = "link comment to other book")
+    public String updateCommentBook(@ShellOption(value = {"-cid", "--cid"}, help = "id of comment to id") Long commentId,
+                                    @ShellOption(value = {"-bid, --bid"}, help = "new book id") Long bookId) {
+        bookCommentService.updateBook(commentId ,bookId);
+        return "Comment was updated";
+    }
+
+    @ShellMethod(value = "delete comment")
+    public String delComment(Long id) {
+        bookCommentService.delete(id);
+        return "Comment was deteted";
     }
 
     @ShellMethod(value = "Show all authors or author with certain ID")

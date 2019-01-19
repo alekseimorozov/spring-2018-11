@@ -1,12 +1,26 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
+@Entity
+@Table(name = "authors")
 public class Author implements Serializable {
+    @Transient
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue
     private Long id;
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+
+    public Author() {}
+
+    public Author(String fullName) {
+        this.fullName = fullName;
+    }
 
     public Long getId() {
         return id;
@@ -38,16 +52,12 @@ public class Author implements Serializable {
             return false;
         }
         Author author = (Author) o;
-        if (fullName == null && author.fullName == null) {
-            return id == author.id;
-        }
-        return id == author.id && fullName != null && fullName.equals(author.fullName);
+        return Objects.equals(id, author.id) && Objects.equals(fullName, author.fullName);
     }
 
     @Override
     public int hashCode() {
-        int result = 31 * 19 + (int) (id ^ (id >>> 32));
-        return fullName == null ? result : 31 * result + fullName.hashCode();
+        return Objects.hash(id, fullName);
     }
 
     public static Author getAuthor(Long id, String name) {
