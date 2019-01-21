@@ -161,3 +161,48 @@
 1547206093439:del-author 2
 1547206099687:show-genres
 1547206106170:show-authors
+1548081782405:help
+1548081802353:show-books
+1548081979830:help
+1548082214978:add-comment 2 "test:\n\n"
+1548082321469:help add-author
+1548082352321:add-author "Pushkin"
+1548082364146:showauthors
+1548082373831:show-authors
+1548082563113:add-genre drama
+1548082569159:show-genres
+1548082593341:help add-book
+1548082628660:add-book "Test book" 2 1
+1548094548371:help
+1548094582138:help add-author
+1548094599691:add-author "Pushkin"
+1548094631277:add-genre Fairy tails"\n"
+1548094654966:add-genre "Fairy tails"
+1548094664231:show-authors
+1548094682528:show-genre
+1548094693716:show-genres
+1548094707481:help add-book
+1548094748277:add-book "golden fish" 2 1
+1548094760294:show-books
+1548094769126:help
+1548094784934:help add-comment
+1548094798356:show-books
+1548094822637:add-comment 3 "my favorite book"
+1548094832762:show-comments
+1548094842496:help
+1548094863418:show-comment
+1548094892451:show-comment 4
+1548094907335:show-comment-by-book 3
+1548094912340:help
+1548094931827:show-comment-for-book 3
+1548094976841:add-comment 3 "the best tail ever"
+1548094993576:show-comment-for-book 3
+1548095047544:add-book "captain's dauter" 2 1
+1548095054482:show-books
+1548095086699:add-comment 6 "interesting story"
+1548095097294:show-comment
+1548095149888:show-comment-for-book 6
+1548095221278:show-comment-for-book 3
+1548095248247:add-comment 9 "test"
+1548095264012:del-comment 5
+1548095271778:show-comment

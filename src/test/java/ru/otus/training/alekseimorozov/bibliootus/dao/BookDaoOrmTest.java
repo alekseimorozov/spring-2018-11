@@ -3,7 +3,6 @@ package ru.otus.training.alekseimorozov.bibliootus.dao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
@@ -16,8 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Class BookDaoOrm")
 class BookDaoOrmTest extends CommonDaoOrmTest {
     @Autowired
-    private TestEntityManager entityManager;
-    @Autowired
     private BookDao bookDao;
 
     @Test
@@ -25,10 +22,12 @@ class BookDaoOrmTest extends CommonDaoOrmTest {
     void create() {
         Book testBook = new Book();
         testBook.setTitle("ТАРАКАНИЩЕ");
-        testBook.setGenre(entityManager.persistAndFlush(new Genre("ДЕТСКАЯ")));
-        testBook.getAuthors().add(entityManager.persistAndFlush(new Author("КАРНЕЙ ЧУКОВСКИЙ")));
+        testBook.setGenre(getEntityManager().persistAndFlush(new Genre("ДЕТСКАЯ")));
+        testBook.getAuthors().add(getEntityManager().persistAndFlush(new Author("КАРНЕЙ ЧУКОВСКИЙ")));
+        getEntityManager().detach(testBook.getGenre());
+        getEntityManager().detach(testBook.getAuthors().get(0));
         bookDao.create(testBook);
-        assertThat(testBook).isEqualTo(entityManager.find(Book.class, testBook.getId()));
+        assertThat(testBook).isEqualTo(getEntityManager().find(Book.class, testBook.getId()));
     }
 
     @Test
@@ -80,7 +79,7 @@ class BookDaoOrmTest extends CommonDaoOrmTest {
     @Test
     @DisplayName("findByAuthorName(nameDosNotExists) returns empty ArrayList<Book>")
     void findByAuthorNameNotFound() {
-        assertThat( bookDao.findByAuthorName("ZZ")).isEqualTo(new ArrayList<Book>());
+        assertThat(bookDao.findByAuthorName("ZZ")).isEqualTo(new ArrayList<Book>());
     }
 
     @Test
@@ -111,27 +110,27 @@ class BookDaoOrmTest extends CommonDaoOrmTest {
         Book book = createBook("First", "ONE", "First");
         book.setTitle("Second");
         bookDao.update(book);
-        assertThat(book).isEqualTo(entityManager.find(Book.class, book.getId()));
+        assertThat(book).isEqualTo(getEntityManager().find(Book.class, book.getId()));
     }
 
     @Test
     @DisplayName("genre of book is updated")
     void updateBookGenre() {
         Book book = createBook("First", "ONE", "First");
-        Genre genre = entityManager.persistAndFlush(new Genre("TWO"));
+        Genre genre = getEntityManager().persistAndFlush(new Genre("TWO"));
         book.setGenre(genre);
         bookDao.update(book);
-        assertThat(genre).isEqualTo(entityManager.find(Book.class, book.getId()).getGenre());
+        assertThat(genre).isEqualTo(getEntityManager().find(Book.class, book.getId()).getGenre());
     }
 
     @Test
     @DisplayName("author is added to the book")
     void addAuthorToBook() {
         Book book = createBook("First", "ONE", "First");
-        Author author = entityManager.persistAndFlush(new Author("Second"));
+        Author author = getEntityManager().persistAndFlush(new Author("Second"));
         book.getAuthors().add(author);
         bookDao.update(book);
-        assertThat(entityManager.find(Book.class, book.getId()).getAuthors()).hasSize(2).contains(author);
+        assertThat(getEntityManager().find(Book.class, book.getId()).getAuthors()).hasSize(2).contains(author);
     }
 
     @Test
@@ -143,7 +142,7 @@ class BookDaoOrmTest extends CommonDaoOrmTest {
         Author third = book.getAuthors().get(2);
         book.getAuthors().remove(1);
         bookDao.update(book);
-        assertThat(entityManager.find(Book.class, book.getId()).getAuthors()).containsOnly(first, third);
+        assertThat(getEntityManager().find(Book.class, book.getId()).getAuthors()).containsOnly(first, third);
     }
 
     @Test
@@ -151,26 +150,26 @@ class BookDaoOrmTest extends CommonDaoOrmTest {
     void delete() {
         Book book = createBook("First", "ONE", "First", "Second", "Third");
         bookDao.delete(book.getId());
-        assertThat(entityManager.find(Book.class, book.getId())).isNull();
+        assertThat(getEntityManager().find(Book.class, book.getId())).isNull();
     }
 
     private Book createBook(String title, String genreName, String... authorNames) {
         Book book = new Book();
         book.setTitle(title);
-        List<Genre> genres = entityManager.getEntityManager().
+        List<Genre> genres = getEntityManager().getEntityManager().
                 createQuery("SELECT g FROM Genre g WHERE g.name = :genreName", Genre.class).
                 setParameter("genreName", genreName).getResultList();
-        book.setGenre(genres.isEmpty() ? entityManager.persistAndFlush(new Genre(genreName)) : genres.get(0));
+        book.setGenre(genres.isEmpty() ? getEntityManager().persistAndFlush(new Genre(genreName)) : genres.get(0));
         for (String authorFullName : authorNames) {
-            List<Author> authors = entityManager.getEntityManager().
+            List<Author> authors = getEntityManager().getEntityManager().
                     createQuery("SELECT a FROM Author a WHERE a.fullName = :authorName", Author.class).
                     setParameter("authorName", authorFullName).getResultList();
-            book.getAuthors().add(authors.isEmpty() ? entityManager.persistAndFlush(new Author(authorFullName)) :
+            book.getAuthors().add(authors.isEmpty() ? getEntityManager().persistAndFlush(new Author(authorFullName)) :
                     authors.get(0));
         }
-        entityManager.persist(book);
-        entityManager.flush();
-        entityManager.detach(book);
+        getEntityManager().persist(book);
+        getEntityManager().flush();
+        getEntityManager().detach(book);
         return book;
     }
 }

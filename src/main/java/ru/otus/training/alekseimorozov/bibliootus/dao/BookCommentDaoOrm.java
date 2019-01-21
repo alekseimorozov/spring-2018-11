@@ -13,6 +13,7 @@ import java.util.List;
 public class BookCommentDaoOrm implements BookCommentDao {
     private static final String READ_ALL = "SELECT bc FROM BookComment bc ";
     private static final String READ_BY_BOOK_ID = READ_ALL + "WHERE bc.book.id = :id";
+
     @PersistenceContext
     private EntityManager entityManager;
 

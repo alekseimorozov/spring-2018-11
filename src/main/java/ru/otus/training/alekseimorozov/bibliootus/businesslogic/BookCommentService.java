@@ -12,4 +12,10 @@ public interface BookCommentService {
     BookComment readById(Long id);
 
     List<BookComment> readByBookId(Long id);
+
+    void updateText(Long id, String text);
+
+    void updateBook(Long commentId, Long bookId);
+
+    void delete(Long id);
 }

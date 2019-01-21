@@ -18,7 +18,8 @@ public class BookComment implements Serializable {
     private Book book;
     private String comment;
 
-    public BookComment() {}
+    public BookComment() {
+    }
 
     public BookComment(String comment) {
         this.comment = comment;

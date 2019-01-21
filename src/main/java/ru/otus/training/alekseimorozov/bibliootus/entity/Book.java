@@ -15,11 +15,11 @@ public class Book implements Serializable {
     @GeneratedValue
     private Long id;
     private String title;
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "author_to_book_map",
-        joinColumns = @JoinColumn(name = "book_id", nullable = false),
-        inverseJoinColumns = @JoinColumn(name = "author_id", nullable = false)
-        )
+            joinColumns = @JoinColumn(name = "book_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "author_id", nullable = false)
+    )
     private List<Author> authors = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})

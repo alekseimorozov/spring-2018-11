@@ -1,22 +1,20 @@
 package ru.otus.training.alekseimorozov.bibliootus.dao;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @DisplayName("Class AuthorDaoOrm")
 class AuthorDaoOrmTest extends CommonDaoOrmTest {
-    @Autowired
-    private TestEntityManager entityManager;
     @Autowired
     private AuthorDao authorDao;
 
@@ -25,16 +23,16 @@ class AuthorDaoOrmTest extends CommonDaoOrmTest {
     void create() {
         Author expectedAuthor = new Author("Test Author");
         authorDao.create(expectedAuthor);
-        assertThat(entityManager.find(Author.class, expectedAuthor.getId())).isEqualTo(expectedAuthor);
+        assertThat(getEntityManager().find(Author.class, expectedAuthor.getId())).isEqualTo(expectedAuthor);
     }
 
     @Test
     @DisplayName("readAll() returns list of all authors")
     void readAll() {
-        Author first = entityManager.persistAndFlush(new Author("НИКОЛАЙ НОСОВ"));
-        Author second = entityManager.persistAndFlush(new Author( "ИЛЬЯ ИЛЬФ"));
-        Author third = entityManager.persistAndFlush(new Author("ЕВГЕНИЙ ПЕТРОВ"));
-        Author fourth = entityManager.persistAndFlush(new Author("КОРНЕЙ ЧУКОВСКИЙ"));
+        Author first = getEntityManager().persistAndFlush(new Author("НИКОЛАЙ НОСОВ"));
+        Author second = getEntityManager().persistAndFlush(new Author("ИЛЬЯ ИЛЬФ"));
+        Author third = getEntityManager().persistAndFlush(new Author("ЕВГЕНИЙ ПЕТРОВ"));
+        Author fourth = getEntityManager().persistAndFlush(new Author("КОРНЕЙ ЧУКОВСКИЙ"));
         detachAll(first, second, third, fourth);
         assertThat(authorDao.readAll()).containsOnly(first, second, third, fourth);
     }
@@ -42,8 +40,8 @@ class AuthorDaoOrmTest extends CommonDaoOrmTest {
     @Test
     @DisplayName("findById(id) returns Author with that id")
     void findById() {
-        Author expected = entityManager.persistAndFlush(new Author("НИКОЛАЙ НОСОВ"));
-        entityManager.detach(expected);
+        Author expected = getEntityManager().persistAndFlush(new Author("НИКОЛАЙ НОСОВ"));
+        getEntityManager().detach(expected);
         assertThat(authorDao.findById(expected.getId())).isEqualTo(expected);
     }
 
@@ -56,9 +54,9 @@ class AuthorDaoOrmTest extends CommonDaoOrmTest {
     @Test
     @DisplayName("findByName(name) returns list of authors which full name contains entered string ")
     void findByName() {
-        Author first = entityManager.persistAndFlush(new Author("НИКОЛАЙ НОСОВ"));
-        Author second = entityManager.persistAndFlush(new Author("ЕВГЕНИЙ ПЕТРОВ"));
-        Author third = entityManager.persistAndFlush(new Author("КОРНЕЙ ЧУКОВСКИЙ"));
+        Author first = getEntityManager().persistAndFlush(new Author("НИКОЛАЙ НОСОВ"));
+        Author second = getEntityManager().persistAndFlush(new Author("ЕВГЕНИЙ ПЕТРОВ"));
+        Author third = getEntityManager().persistAndFlush(new Author("КОРНЕЙ ЧУКОВСКИЙ"));
         detachAll(first, second, third);
         assertThat(authorDao.findByName("Ов")).containsOnly(first, second, third);
     }
@@ -74,12 +72,12 @@ class AuthorDaoOrmTest extends CommonDaoOrmTest {
     void findByBookId() {
         Book book = new Book();
         book.setTitle("Test");
-        book.setGenre(entityManager.persistAndFlush(new Genre("Test")));
-        Author first = entityManager.persistAndFlush(new Author("ИЛЬЯ ИЛЬФ"));
-        Author second = entityManager.persistAndFlush(new Author("ЕВГЕНИЙ ПЕТРОВ"));
+        book.setGenre(getEntityManager().persistAndFlush(new Genre("Test")));
+        Author first = getEntityManager().persistAndFlush(new Author("ИЛЬЯ ИЛЬФ"));
+        Author second = getEntityManager().persistAndFlush(new Author("ЕВГЕНИЙ ПЕТРОВ"));
         book.getAuthors().add(first);
         book.getAuthors().add(second);
-        Long bookId = entityManager.persistAndGetId(book, Long.class);
+        Long bookId = getEntityManager().persistAndGetId(book, Long.class);
         assertThat(authorDao.findByBookId(bookId)).containsOnly(first, second);
     }
 
@@ -92,20 +90,20 @@ class AuthorDaoOrmTest extends CommonDaoOrmTest {
     @Test
     @DisplayName("full name is updated")
     void update() {
-        Author expected = entityManager.persistAndFlush(new Author("Самуил Маршак"));
-        entityManager.detach(expected);
+        Author expected = getEntityManager().persistAndFlush(new Author("Самуил Маршак"));
+        getEntityManager().detach(expected);
         expected.setFullName("Борис Житков");
         authorDao.update(expected);
-        assertThat(entityManager.find(Author.class, expected.getId())).isEqualTo(expected);
+        assertThat(getEntityManager().find(Author.class, expected.getId())).isEqualTo(expected);
     }
 
     @Test
     @DisplayName("Author is deleted")
     void delete() {
-        Author author = entityManager.persistAndFlush(new Author("Test Author"));
-        entityManager.detach(author);
+        Author author = getEntityManager().persistAndFlush(new Author("Test Author"));
+        getEntityManager().detach(author);
         authorDao.delete(author.getId());
-        assertThat(entityManager.find(Author.class, author.getId())).isNull();
+        assertThat(getEntityManager().find(Author.class, author.getId())).isNull();
     }
 
     @Test
@@ -113,18 +111,18 @@ class AuthorDaoOrmTest extends CommonDaoOrmTest {
     void deleteWithForeignKey() {
         Book book = new Book();
         book.setTitle("Test");
-        book.setGenre(entityManager.persistAndFlush(new Genre("Test")));
-        Author author = entityManager.persistAndFlush(new Author("ИЛЬЯ ИЛЬФ"));
+        book.setGenre(getEntityManager().persistAndFlush(new Genre("Test")));
+        Author author = getEntityManager().persistAndFlush(new Author("ИЛЬЯ ИЛЬФ"));
         book.getAuthors().add(author);
-        entityManager.persist(book);
-        entityManager.flush();
-        entityManager.detach(book);
-        assertThatExceptionOfType(DataIntegrityViolationException.class);
+        getEntityManager().persist(book);
+        getEntityManager().flush();
+        getEntityManager().detach(book);
+        assertThatExceptionOfType(PersistenceException.class).isThrownBy(() -> authorDao.delete(author.getId()));
     }
 
-    protected void detachAll(Object... entities ) {
+    protected void detachAll(Object... entities) {
         for (Object entity : entities) {
-            entityManager.detach(entity);
+            getEntityManager().detach(entity);
         }
     }
 }

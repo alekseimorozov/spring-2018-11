@@ -3,10 +3,10 @@ package ru.otus.training.alekseimorozov.bibliootus.dao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +74,6 @@ class GenreDaoOrmTest extends CommonDaoOrmTest {
         assertThat(getEntityManager().find(Genre.class, 77L)).isNull();
     }
 
-
     @Test
     @DisplayName("throws exception when try to delete genre which linked to some books")
     void deleteForeignKey() {
@@ -82,8 +81,8 @@ class GenreDaoOrmTest extends CommonDaoOrmTest {
         book.setTitle("Test");
         Genre expected = createGenre("ДЕТСКАЯ");
         book.setGenre(expected);
-        genreDao.delete(expected.getId());
-        assertThatExceptionOfType(DataIntegrityViolationException.class);
+        getEntityManager().persistAndFlush(book);
+        assertThatExceptionOfType(PersistenceException.class).isThrownBy(() -> genreDao.delete(expected.getId()));
     }
 
     private Genre createGenre(String name) {

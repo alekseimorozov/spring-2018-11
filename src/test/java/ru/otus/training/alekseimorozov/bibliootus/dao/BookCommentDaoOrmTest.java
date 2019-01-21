@@ -9,8 +9,8 @@ import ru.otus.training.alekseimorozov.bibliootus.entity.BookComment;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("class BookCommentDaoOrm")
 class BookCommentDaoOrmTest extends CommonDaoOrmTest {
@@ -25,6 +25,15 @@ class BookCommentDaoOrmTest extends CommonDaoOrmTest {
         expected.setBook(book);
         bookCommentDao.create(expected);
         assertThat(getEntityManager().find(BookComment.class, expected.getId())).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("throws  IllegalStateException wheh try to save new comment into database with empty Book")
+    void createWithEmptyBook() {
+        Book emptyBook = new Book();
+        BookComment expected = new BookComment("Test comment");
+        expected.setBook(emptyBook);
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> bookCommentDao.create(expected));
     }
 
     @Test
@@ -91,6 +100,16 @@ class BookCommentDaoOrmTest extends CommonDaoOrmTest {
         expected.setBook(two);
         bookCommentDao.update(expected);
         assertThat(getEntityManager().find(BookComment.class, expected.getId())).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("update book of BookComment")
+    void updateBookCommentBookWithEmptyBook() {
+        Book one = createBook("One");
+        BookComment expected = createBookComment("Test comment", one);
+        expected.setBook(new Book());
+        bookCommentDao.update(expected);
+//        assertThat(getEntityManager().find(BookComment.class, expected.getId())).isEqualTo(expected);
     }
 
     @Test

@@ -16,7 +16,8 @@ public class Author implements Serializable {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    public Author() {}
+    public Author() {
+    }
 
     public Author(String fullName) {
         this.fullName = fullName;
