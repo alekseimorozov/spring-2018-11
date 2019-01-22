@@ -1,33 +1,24 @@
 package ru.otus.training.alekseimorozov.bibliootus.dao;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 
 import java.util.List;
 
-public interface BookDao {
-    Book create(Book testBook);
+@Repository
+public interface BookDao extends CrudRepository<Book, Long> {
+//    @Query("SELECT DISTINCT b FROM Book b WHERE UPPER(b.title) LIKE :name")
+    List<Book> findByTitleContainingIgnoreCase(String name);
 
-    List<Book> readAll();
+    @Query("SELECT DISTINCT b FROM Book b JOIN b.authors a WHERE UPPER(a.fullName) LIKE UPPER(CONCAT('%',:name,'%'))")
+    List<Book> findByAuthorName(@Param("name") String name);
 
-    Book readById(Long id);
+    @Query("SELECT DISTINCT b FROM Book b JOIN b.authors a WHERE a.id = :authorId")
+    List<Book> findByAuthorId(@Param("authorId") Long authorId);
 
-    List<Book> findByName(String name);
-
-    List<Book> findByAuthorName(String name);
-
-    List<Book> findByAuthorId(Long id);
-
-    List<Book> findByGenreId(Long id);
-
-    void updateBookName(Long id, String name);
-
-    void updateBookGenre(Long bookId, Long genreId);
-
-    void addAuthorToBook(Long bookId, Long authorId);
-
-    void removeAuthorFromBook(Long bookId, Long authorId);
-
-    void update(Book book);
-
-    void delete(Long id);
+    @Query("SELECT DISTINCT b FROM Book b JOIN b.genre g WHERE g.id = :genreId")
+    List<Book> findByGenreId(@Param("genreId") Long genreId);
 }

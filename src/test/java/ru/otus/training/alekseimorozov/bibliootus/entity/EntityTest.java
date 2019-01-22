@@ -32,9 +32,13 @@ class EntityTest {
     @Test
     public void bookTest() {
         Genre testGente = entityManager.persistAndFlush(Genre.getGenre(null, "Test genre"));
-        Author first = Author.getAuthor(null, "First");
-        Author second = Author.getAuthor(null, "Second");
-        Author third = Author.getAuthor(null, "Third");
+        entityManager.detach(testGente);
+        Author first = entityManager.persistAndFlush(new Author("First"));
+        Author second = entityManager.persistAndFlush(new Author("Second"));
+        Author third =entityManager.persistAndFlush(new Author("Third"));
+        entityManager.detach(first);
+        entityManager.detach(second);
+        entityManager.detach(third);
         Book expected = new Book();
         expected.setTitle("Test");
         expected.setGenre(testGente);

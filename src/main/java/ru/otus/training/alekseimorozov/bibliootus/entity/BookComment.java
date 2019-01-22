@@ -11,11 +11,12 @@ public class BookComment implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "book_id")
     private Book book;
+    @Column(name = "comment_text")
     private String comment;
 
     public BookComment() {

@@ -18,26 +18,28 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Genre create(String genreName) {
-        return genreDao.create(Genre.getGenre(null, genreName));
+        return genreDao.save(new Genre(genreName));
     }
 
     @Override
     public List<Genre> readAll() {
-        return genreDao.readAll();
+        return (List<Genre>) genreDao.findAll();
     }
 
     @Override
     public Genre readById(Long genreId) {
-        return genreDao.readById(genreId);
+        return genreDao.findById(genreId).get();
     }
 
     @Override
     public void update(Long genreId, String name) {
-        genreDao.update(genreId, name);
+        Genre genre = genreDao.findById(genreId).get();
+        genre.setName(name);
+        genreDao.save(genre);
     }
 
     @Override
     public void delete(Long genreId) {
-        genreDao.delete(genreId);
+        genreDao.deleteById(genreId);
     }
 }

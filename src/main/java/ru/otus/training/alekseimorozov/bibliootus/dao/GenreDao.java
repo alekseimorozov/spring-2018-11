@@ -1,19 +1,9 @@
 package ru.otus.training.alekseimorozov.bibliootus.dao;
 
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
-import java.util.List;
-
-public interface GenreDao {
-    Genre create(Genre genre);
-
-    List<Genre> readAll();
-
-    Genre readById(Long genreId);
-
-    void update(Long genreId, String name);
-
-    void update(Genre genre);
-
-    void delete(Long genreId);
+@Repository
+public interface GenreDao extends CrudRepository<Genre, Long> {
 }

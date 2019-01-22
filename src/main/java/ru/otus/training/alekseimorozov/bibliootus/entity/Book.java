@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "books")
 public class Book implements Serializable {
     @Transient
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)

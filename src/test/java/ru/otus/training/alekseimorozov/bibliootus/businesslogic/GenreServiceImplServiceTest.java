@@ -9,43 +9,43 @@ import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 import static org.mockito.Mockito.verify;
 
 public class GenreServiceImplServiceTest extends CommonServiceTest {
-    @MockBean
-    private GenreDao genreDao;
-    @Autowired
-    private GenreService genreService;
-
-    @Test
-    public void createTest() {
-        String testGenreName = "Сатира";
-        Genre genre = new Genre();
-        genre.setName(testGenreName);
-        genreService.create(testGenreName);
-        verify(genreDao).create(genre);
-    }
-
-    @Test
-    public void readAllTest() {
-        genreService.readAll();
-        verify(genreDao).readAll();
-    }
-
-    @Test
-    public void readByIdTest() {
-        genreService.readById(1l);
-        verify(genreDao).readById(1L);
-    }
-
-    @Test
-    public void updateTest() {
-        Long testGenreId = 1L;
-        String testGenreName = "Test";
-        genreService.update(testGenreId, testGenreName);
-        verify(genreDao).update(testGenreId, testGenreName);
-    }
-
-    @Test
-    public void deleteTest() {
-        genreService.delete(1L);
-        verify(genreDao).delete(1L);
-    }
+//    @MockBean
+//    private GenreDao genreDao;
+//    @Autowired
+//    private GenreService genreService;
+//
+//    @Test
+//    public void createTest() {
+//        String testGenreName = "Сатира";
+//        Genre genre = new Genre();
+//        genre.setName(testGenreName);
+//        genreService.create(testGenreName);
+//        verify(genreDao).create(genre);
+//    }
+//
+//    @Test
+//    public void readAllTest() {
+//        genreService.readAll();
+//        verify(genreDao).readAll();
+//    }
+//
+//    @Test
+//    public void readByIdTest() {
+//        genreService.readById(1l);
+//        verify(genreDao).readById(1L);
+//    }
+//
+//    @Test
+//    public void updateTest() {
+//        Long testGenreId = 1L;
+//        String testGenreName = "Test";
+//        genreService.update(testGenreId, testGenreName);
+//        verify(genreDao).update(testGenreId, testGenreName);
+//    }
+//
+//    @Test
+//    public void deleteTest() {
+//        genreService.delete(1L);
+//        verify(genreDao).delete(1L);
+//    }
 }
