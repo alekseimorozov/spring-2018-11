@@ -9,7 +9,7 @@ import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-public class AccountServiceImplServiceTest extends CommonServiceTest {
+public class AuthorServiceImplServiceTest extends CommonServiceTest {
     @MockBean
     private AuthorDao authorDao;
     @Autowired

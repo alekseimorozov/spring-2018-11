@@ -1,15 +1,30 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+@Entity
 public class Book implements Serializable {
+    @Transient
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue
     private Long id;
     private String title;
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @JoinTable(name = "author_to_book_map",
+            joinColumns = @JoinColumn(name = "book_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "author_id", nullable = false)
+    )
+    private List<Author> authors = new ArrayList<>();
+
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinColumn(name = "genre_id")
+    private Genre genre;
 
     public Long getId() {
         return id;
@@ -26,9 +41,6 @@ public class Book implements Serializable {
     public void setTitle(String title) {
         this.title = title;
     }
-
-    private List<Author> authors = new ArrayList<>();
-    private Genre genre;
 
     public List<Author> getAuthors() {
         return authors;
@@ -67,18 +79,12 @@ public class Book implements Serializable {
             return false;
         }
         Book book = (Book) o;
-        boolean namesIsEqual = title == null && book.title == null ? true : title != null && title.equals(book.title);
-        boolean genreIsEquals = genre == null && book.genre == null ? true : genre != null && genre.equals(book.genre);
-        boolean authorsIsEqueal = Arrays.equals(authors.toArray(), book.authors.toArray());
-        return getId() == book.getId() && namesIsEqual && genreIsEquals && authorsIsEqueal;
+        return Objects.equals(id, book.id) && Objects.equals(title, book.title) && Objects.equals(genre, book.genre) &&
+                Objects.deepEquals(authors.toArray(), book.authors.toArray());
     }
 
     @Override
     public int hashCode() {
-        int result = 31 * 19 + (int) (id ^ (id >>> 32));
-        if (title != null) {
-            result = 31 * result + title.hashCode();
-        }
-        return genre == null ? result : 31 * result + genre.hashCode();
+        return Objects.hash(id, title, genre);
     }
 }

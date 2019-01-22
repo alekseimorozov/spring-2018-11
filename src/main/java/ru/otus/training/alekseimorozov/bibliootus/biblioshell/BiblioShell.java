@@ -1,14 +1,15 @@
 package ru.otus.training.alekseimorozov.bibliootus.biblioshell;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.AuthorService;
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.BookCommentService;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.BookService;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.GenreService;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
+
+import javax.persistence.PersistenceException;
 
 import static ru.otus.training.alekseimorozov.bibliootus.entity.EntityPrinter.*;
 
@@ -20,12 +21,13 @@ public class BiblioShell {
     private AuthorService authorService;
     private GenreService genreService;
     private BookService bookService;
+    private BookCommentService bookCommentService;
 
-    @Autowired
-    public BiblioShell(AuthorService authorService, GenreService genreService, BookService bookService) {
+    public BiblioShell(AuthorService authorService, GenreService genreService, BookService bookService, BookCommentService bookCommentService) {
         this.authorService = authorService;
         this.genreService = genreService;
         this.bookService = bookService;
+        this.bookCommentService = bookCommentService;
     }
 
     @ShellMethod("Show list of all books or book with given id")
@@ -97,7 +99,7 @@ public class BiblioShell {
 
     @ShellMethod("Update title of book")
     public String updateBookTitle(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
-                                 @ShellOption(value = {"-title", "--title"}) String title) {
+                                  @ShellOption(value = {"-title", "--title"}) String title) {
         bookService.updateBookName(bookId, title);
         return "Book name was updated";
     }
@@ -105,21 +107,73 @@ public class BiblioShell {
     @ShellMethod("Add new author to book's list of authors")
     public String addAuthorToBook(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
                                   @ShellOption(value = {"-aid", "--aid"}, help = "define id of author to add") Long authorId) {
-        bookService.addAuthorToBook(bookId, authorId);
-        return "Author was added to book";
+        try {
+            bookService.addAuthorToBook(bookId, authorId);
+            return "Author was added to book";
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
     }
 
     @ShellMethod("Remove author from book's list of authors")
     public String delAuthorFromBook(@ShellOption(value = {"-bid", "--bid"}, help = "define id of book") Long bookId,
                                     @ShellOption(value = {"-aid", "--aid"}, help = "define id of author to remove") Long authorId) {
-        bookService.removeAuthorFromBook(bookId, authorId);
-        return "Author was removed from book";
+        try {
+            bookService.removeAuthorFromBook(bookId, authorId);
+            return "Author was removed from book";
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
     }
 
     @ShellMethod(value = "Remove book from library", key = "del-book")
     public String deleteBook(@ShellOption(value = {"-id", "--id"}, help = "define id of book") Long id) {
         bookService.delete(id);
         return "Book was removed";
+    }
+
+    @ShellMethod(value = "add comment tu book")
+    public String addComment(@ShellOption(help = "define id of book") Long bookId,
+                             @ShellOption(value = {"-c", "--c"}, help = "text of comment") String comment) {
+        try {
+            bookCommentService.addComment(bookId, comment);
+            return "Comment saved";
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
+    }
+
+    @ShellMethod(value = "show all comments or comment for required id")
+    public String showComment(@ShellOption(defaultValue = "0") Long id) {
+        if (id == 0) {
+            return printAllComments(bookCommentService.readAll());
+        } else {
+            return printComment(bookCommentService.readById(id));
+        }
+    }
+
+    @ShellMethod(value = "show all comments for book with required id")
+    public String showCommentForBook(Long id) {
+        return printAllComments(bookCommentService.readByBookId(id));
+    }
+
+    @ShellMethod(value = "update text of comment")
+    public String updateCommentText(Long id, String text) {
+        bookCommentService.updateText(id, text);
+        return "Comment was updated";
+    }
+
+    @ShellMethod(value = "link comment to other book")
+    public String updateCommentBook(@ShellOption(value = {"-cid", "--cid"}, help = "id of comment to id") Long commentId,
+                                    @ShellOption(value = {"-bid, --bid"}, help = "new book id") Long bookId) {
+        bookCommentService.updateBook(commentId, bookId);
+        return "Comment was updated";
+    }
+
+    @ShellMethod(value = "delete comment")
+    public String delComment(Long id) {
+        bookCommentService.delete(id);
+        return "Comment was deteted";
     }
 
     @ShellMethod(value = "Show all authors or author with certain ID")
@@ -140,7 +194,6 @@ public class BiblioShell {
         }
     }
 
-
     @ShellMethod("Add new author to library")
     public String addAuthor(String name) {
         authorService.create(name);
@@ -152,7 +205,7 @@ public class BiblioShell {
         try {
             authorService.delete(id);
             return "Author was removed";
-        } catch (DataIntegrityViolationException e) {
+        } catch (PersistenceException e) {
             return String.format(ERR_MSG, "AUTHOR");
         }
     }
@@ -184,7 +237,7 @@ public class BiblioShell {
         try {
             genreService.delete(id);
             return "genre was deleted";
-        } catch (DataIntegrityViolationException e) {
+        } catch (PersistenceException e) {
             return String.format(ERR_MSG, "GENRE");
         }
     }

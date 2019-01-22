@@ -13,5 +13,7 @@ public interface GenreDao {
 
     void update(Long genreId, String name);
 
+    void update(Genre genre);
+
     void delete(Long genreId);
 }

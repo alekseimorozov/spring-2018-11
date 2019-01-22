@@ -46,4 +46,16 @@ public class EntityPrinter {
     public static String printGenre(Genre genre) {
         return genre + FOOTER;
     }
+
+    public static String printAllComments(List<BookComment> comments) {
+        StringBuilder result = new StringBuilder();
+        for (BookComment comment : comments) {
+            result.append(printComment(comment));
+        }
+        return result.toString();
+    }
+
+    public static String printComment(BookComment comment) {
+        return comment + FOOTER;
+    }
 }
