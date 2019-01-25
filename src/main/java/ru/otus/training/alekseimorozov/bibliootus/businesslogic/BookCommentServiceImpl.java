@@ -1,7 +1,9 @@
 package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.serviceexception.BiblioServiceException;
 import ru.otus.training.alekseimorozov.bibliootus.dao.BookCommentDao;
 import ru.otus.training.alekseimorozov.bibliootus.dao.BookDao;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
@@ -34,7 +36,7 @@ public class BookCommentServiceImpl implements BookCommentService {
 
     @Override
     public BookComment readById(Long id) {
-        return bookCommentDao.findById(id).get();
+        return checkAndReturnBookCommentIfExist(id);
     }
 
     @Override
@@ -56,24 +58,22 @@ public class BookCommentServiceImpl implements BookCommentService {
         bookCommentDao.save(bookComment);
     }
 
-    private Book checkAndReturnBookIfExist(Long bookId) throws IllegalStateException {
-        Book book = bookDao.findById(bookId).get();
-        if (book.getId() == null) {
-            throw new IllegalStateException(String.format("Book with id: %d doesn't exist", bookId));
+    @Override
+    public void delete(Long id) {
+        try {
+            bookCommentDao.deleteById(id);
+        } catch(EmptyResultDataAccessException e) {
+            throw new BiblioServiceException(String.format("BookComment with id %d do not found", id), e);
         }
-        return book;
+    }
+
+    private Book checkAndReturnBookIfExist(Long bookId) throws IllegalStateException {
+        return bookDao.findById(bookId)
+                .orElseThrow(() -> new BiblioServiceException(String.format("Book with id %d wasn't found", bookId)));
     }
 
     private BookComment checkAndReturnBookCommentIfExist(Long commentId) throws IllegalStateException {
-        BookComment comment = bookCommentDao.findById(commentId).get();
-        if (comment.getId() == null) {
-            throw new IllegalStateException(String.format("BookComment with id: %d doesn't exist", commentId));
-        }
-        return comment;
-    }
-
-    @Override
-    public void delete(Long id) {
-        bookCommentDao.deleteById(id);
+        return bookCommentDao.findById(commentId)
+                .orElseThrow(() -> new BiblioServiceException(String.format("BookComment with id: %d doesn't exist", commentId)));
     }
 }

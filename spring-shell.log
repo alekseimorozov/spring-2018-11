@@ -206,3 +206,122 @@
 1548095248247:add-comment 9 "test"
 1548095264012:del-comment 5
 1548095271778:show-comment
+1548321082744:help
+1548321102051:show-books
+1548321108581:show-books 1
+1548321118328:help
+1548321133293:help add-book
+1548321155317:add-book "test" 1 1
+1548336954492:show-books
+1548336978388:show-authors
+1548336989823:help
+1548337004992:del-author 77
+1548337030609:del-author 1
+1548337254443:stacktrace
+1548337519372:del-author 77
+1548337527495:stacktrase
+1548337533634:stacktrace
+1548337545303:del-author 77
+1548337558676:stacktrace
+1548338347845:show-authors
+1548338355999:del-author 77
+1548338381493:stacktrace
+1548338416531:del-author 1
+1548338463173:stacktrace
+1548338525501:show-books
+1548338533775:del-book 2
+1548338548925:show-books 2
+1548338556064:show-books
+1548338566359:del-genre 1
+1548338692779:del-genre 77
+1548338849526:del-genre 1
+1548338891828:del-book 77
+1548339140761:show-books
+1548339164662:help
+1548339465312:help add-author
+1548339487182:add-author "A Puskin"
+1548339588435:show-books
+1548339748847:show-authors
+1548339760469:add-author-to-book 4 7
+1548339778637:add-author-to-book 4 1
+1548339786401:add-author-to-book 4 5
+1548339794368:show-books 4
+1548340153358:update-author 77 "ttt"
+1548340179102:update-author 5 "АЛЕКСАНДР СЕРГЕЕВИЧ ПУШКИН"
+1548340221842:show-genres
+1548340236135:add-genre "TEST"
+1548340243352:show-genres 77
+1548340250991:show-genres
+1548340261659:update-genre 77 "ttt"
+1548340291292:update-genre 3 "ДЕТЕКТИВ"
+1548340297712:show-genres 3
+1548340332187:del-genre 777
+1548340344184:del genre 1
+1548340352151:del-genre 1
+1548340635374:del-genre 77
+1548340647543:del-genre 1
+1548340694405:show-genres
+1548340736238:show-comment
+1548340749220:show-comment 3
+1548340808172:show-comment-for-book
+1548340813952:show-comment-for-book 1
+1548340838868:show-comment-for-book 2
+1548340842711:show-comment-for-book 3
+1548340877529:del-comment 77
+1548340886339:del-comment 3
+1548340913786:help add-comment
+1548340925533:add-comment 77 "TEST"
+1548340934266:show-books
+1548340953636:add-comment 4 ""
+1548340981235:add-comment 4 "ОЧЕНЬ СМЕШНО И ПОУЧИТЕЛЬНО"
+1548341005902:show-comment-for-book 4
+1548341050625:books-by-author-id 77
+1548341053672:books-by-author-id 1
+1548341058186:books-by-author-id 2
+1548341061701:books-by-author-id 3
+1548341075448:books-by-author-id 4
+1548341093787:show-books
+1548341112734:books-by-author-id 4
+1548341147085:books-by-author-name чу
+1548341153974:books-by-author-name ф
+1548341164345:books-by-author-name ччч
+1548341199821:books-with-genre 2
+1548341204007:books-with-genre 1
+1548341249284:del-author 4
+1548341276684:del-author-from-book 77 4
+1548341281058:del-author-from-book 1 77
+1548341302209:show-books 1
+1548341354726:del-author-from-book 1 4
+1548341361881:show-books 1
+1548341385859:del-author 4
+1548341422675:books-by-author-id 4
+1548341468149:del-book 77
+1548341474491:del-book 3
+1548341484473:show-books 3
+1548341518113:find-authors-by-name "чуЭ\n"
+1548341532000:find-authors-by-name "чу"
+1548341542670:find-authors-by-name "й"
+1548341589015:show-books
+1548341599529:update-book-title 77 "test"
+1548341613838:update-book-title 4 "ПРИКЛЮЧЕНИЯ НЕЗНАЙКИ"
+1548341619977:show-books 4
+1548341665168:show-comments
+1548341673994:show-comment
+1548341699832:show-comment-for-book 4
+1548341725185:update-comment-book 4 2
+1548341741993:show-comment-for-book 4
+1548341744759:show-comment-for-book 2
+1548341773640:update-comment-text 55 "b"
+1548341791214:update-comment-text 4 ""
+1548341806132:update-comment-text "CooL"
+1548341823313:update-comment-text 4 "cool"
+1548341836326:show-comment 4
+1548341865257:find-books-by-name "з"
+1548341884033:find-books-by-name "аЙ"
+1548341906903:show-genres
+1548341913276:update-book-genre 55 66
+1548341920384:update-book-genre 1 55
+1548341924008:update-book-genre 1 2
+1548341959670:show-authors
+1548341966699:del-author 4
+1548341971980:show-authors
