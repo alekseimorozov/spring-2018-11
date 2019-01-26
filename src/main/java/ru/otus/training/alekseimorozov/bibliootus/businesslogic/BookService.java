@@ -5,7 +5,7 @@ import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 import java.util.List;
 
 public interface BookService {
-    Book create(Book book);
+    Book create(String title, Long genreId, Long author_id);
 
     List<Book> readAll();
 

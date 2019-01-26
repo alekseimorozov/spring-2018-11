@@ -5,22 +5,22 @@ import java.util.List;
 public class EntityPrinter {
     private static final String FOOTER = "\n------------------------\n";
 
-    public static String printAllBooks(List<Book> books) {
+    public static String printAllBooks(List<Book> books, String... messages) {
         StringBuilder result = new StringBuilder();
         for (Book book : books) {
             result.append(printBook(book));
         }
-        return result.toString();
+        return messages.length == 0 ? result.toString() : messages[0] + result.toString();
     }
 
-    public static String printBook(Book book) {
+    public static String printBook(Book book, String... messages) {
         StringBuilder result = new StringBuilder();
         if (book != null) {
             result.append(book);
         } else {
             result.append("Book was not found");
         }
-        return result.append(FOOTER).toString();
+        return messages.length == 0 ? result.append(FOOTER).toString() : messages[0] + result.append(FOOTER).toString();
     }
 
     public static String printAllAuthors(List<Author> authors) {

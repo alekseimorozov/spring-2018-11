@@ -1,3 +1,9 @@
 spring:
-  jpa:
-    show-sql: true
+  datasource:
+    name: jdbc:h2:mem:testdb
+    data: test_data.sql
+  banner:
+    location: banner/practicelibBanner.txt
+  output:
+    ansi:
+      enabled: ALWAYS

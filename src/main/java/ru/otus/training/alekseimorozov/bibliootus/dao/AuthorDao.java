@@ -1,23 +1,17 @@
 package ru.otus.training.alekseimorozov.bibliootus.dao;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 
 import java.util.List;
 
-public interface AuthorDao {
-    void create(Author author);
+@Repository
+public interface AuthorDao extends CrudRepository<Author, Long> {
+    List<Author> findByFullNameContainingIgnoreCase(String name);
 
-    List<Author> readAll();
-
-    Author findById(Long id);
-
-    List<Author> findByName(String name);
-
-    List<Author> findByBookId(Long bookId);
-
-    void update(Long id, String name);
-
-    void update(Author author);
-
-    void delete(Long authorId);
+    @Query("SELECT DISTINCT a FROM Book b JOIN b.authors a WHERE b.id = :bookId")
+    List<Author> findByBookId(@Param("bookId") Long bookId);
 }
