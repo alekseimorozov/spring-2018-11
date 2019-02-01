@@ -1,67 +1,52 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import org.bson.Document;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.mongodb.core.DbCallback;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DataMongoTest
 class EntityTest {
     @Autowired
-    private TestEntityManager entityManager;
+    private MongoTemplate mongoTemplate;
 
     @Test
     public void authorTest() {
-        Author expected = entityManager.persistAndFlush(Author.getAuthor(null, "Test"));
-        entityManager.detach(expected);
-        assertEquals(expected, entityManager.find(Author.class, expected.getId()));
+        Author expected = mongoTemplate.save(new Author( "Test"));
+        assertThat(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Author.class))
+                .as("", expected);
     }
 
     @Test
     public void genreTest() {
-        Genre expected = entityManager.persistAndFlush(Genre.getGenre(null, "Test"));
-        entityManager.detach(expected);
-        assertEquals(expected, entityManager.find(Genre.class, expected.getId()));
+        Genre expected = mongoTemplate.save(new Genre("Test"));
+        assertThat(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Genre.class))
+                .as("", expected);
     }
 
     @Test
     public void bookTest() {
-        Genre testGente = entityManager.persistAndFlush(Genre.getGenre(null, "Test genre"));
-        entityManager.detach(testGente);
-        Author first = entityManager.persistAndFlush(new Author("First"));
-        Author second = entityManager.persistAndFlush(new Author("Second"));
-        Author third =entityManager.persistAndFlush(new Author("Third"));
-        entityManager.detach(first);
-        entityManager.detach(second);
-        entityManager.detach(third);
+        Genre testGente = mongoTemplate.save(new Genre("Test genre"));
+        Author first = mongoTemplate.save(new Author("First"));
+        Author second = mongoTemplate.save(new Author("Second"));
+        Author third = mongoTemplate.save(new Author("Third"));
         Book expected = new Book();
         expected.setTitle("Test");
         expected.setGenre(testGente);
         expected.getAuthors().add(first);
         expected.getAuthors().add(second);
         expected.getAuthors().add(third);
-        entityManager.persistAndFlush(expected);
-        entityManager.detach(expected);
-        Book actual = entityManager.find(Book.class, expected.getId());
-        assertEquals(actual, expected);
-        assertArrayEquals(actual.getAuthors().toArray(), expected.getAuthors().toArray());
-    }
-
-    @Test
-    public void bookCommentTest() {
-        Book testBook = new Book();
-        testBook.setTitle("Test book");
-        entityManager.persist(testBook);
-        BookComment expected = new BookComment("Test comment");
-        expected.setBook(testBook);
-        Object id = entityManager.persistAndGetId(expected);
-        entityManager.flush();
-        entityManager.detach(expected);
-        assertEquals(expected, entityManager.find(BookComment.class, id));
+        mongoTemplate.save(expected);
+        assertThat(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Book.class))
+                .as("", expected);
     }
 }

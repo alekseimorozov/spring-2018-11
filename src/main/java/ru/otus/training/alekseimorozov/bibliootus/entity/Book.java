@@ -1,37 +1,31 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Entity
-@Table(name = "books")
+@Document(collection = "books")
 public class Book implements Serializable {
     @Transient
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private String title;
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-    @JoinTable(name = "author_to_book_map",
-            joinColumns = @JoinColumn(name = "book_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "author_id", nullable = false)
-    )
     private List<Author> authors = new ArrayList<>();
-
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinColumn(name = "genre_id")
     private Genre genre;
+    private List<String> comments = new ArrayList<>();
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -59,6 +53,14 @@ public class Book implements Serializable {
         this.genre = genre;
     }
 
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<String> comments) {
+        this.comments = comments;
+    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -81,7 +83,7 @@ public class Book implements Serializable {
         }
         Book book = (Book) o;
         return Objects.equals(id, book.id) && Objects.equals(title, book.title) && Objects.equals(genre, book.genre) &&
-                Objects.deepEquals(authors.toArray(), book.authors.toArray());
+                Objects.deepEquals(authors.toArray(), book.authors.toArray()) && Objects.deepEquals(comments.toArray(), book.comments.toArray());
     }
 
     @Override

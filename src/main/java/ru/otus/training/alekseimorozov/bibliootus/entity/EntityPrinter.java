@@ -47,15 +47,15 @@ public class EntityPrinter {
         return genre + FOOTER;
     }
 
-    public static String printAllComments(List<BookComment> comments) {
+    public static String printAllComments(List<String> comments) {
         StringBuilder result = new StringBuilder();
-        for (BookComment comment : comments) {
-            result.append(printComment(comment));
+        for (int i = 0;  i < comments.size(); i++) {
+            result.append(printComment(comments.get(i), i));
         }
         return result.toString();
     }
 
-    public static String printComment(BookComment comment) {
-        return comment + FOOTER;
+    public static String printComment(String comment, int i) {
+        return comment + " (id: " + i + ")" + FOOTER;
     }
 }

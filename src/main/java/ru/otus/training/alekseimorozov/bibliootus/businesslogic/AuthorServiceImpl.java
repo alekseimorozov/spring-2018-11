@@ -1,22 +1,24 @@
 package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.otus.training.alekseimorozov.bibliootus.businesslogic.serviceexception.BiblioServiceException;
 import ru.otus.training.alekseimorozov.bibliootus.dao.AuthorDao;
+import ru.otus.training.alekseimorozov.bibliootus.dao.BookDao;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
+import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 
 import java.util.List;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
     private AuthorDao authorDao;
+    private BookDao bookDao;
 
     @Autowired
-    public AuthorServiceImpl(AuthorDao authorDao) {
+    public AuthorServiceImpl(AuthorDao authorDao, BookDao bookDao) {
         this.authorDao = authorDao;
+        this.bookDao = bookDao;
     }
 
     @Override
@@ -29,45 +31,43 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public List<Author> readAll() {
-        return (List<Author>) authorDao.findAll();
+        return authorDao.findAll();
     }
 
     @Override
-    public Author findById(Long id) {
+    public Author findById(String id) {
         return checkAndReturnAuthorIfExists(id);
     }
 
     @Override
     public List<Author> findByName(String name) {
-        return authorDao.findByFullNameContainingIgnoreCase(name);
+        return authorDao.findByFullNameIgnoreCase(name);
     }
 
     @Override
-    public List<Author> findByBook(Long bookId) {
-        return authorDao.findByBookId(bookId);
-    }
-
-    @Override
-    public void update(Long id, String name) {
+    public void update(String id, String name) {
         Author author = checkAndReturnAuthorIfExists(id);
+        List<Book> books = bookDao.findByAuthors(author);
         author.setFullName(name);
         authorDao.save(author);
+        books.stream()
+                .flatMap(book -> book.getAuthors().stream())
+                .filter(currentAuthor -> currentAuthor.getId().equals(id))
+                .forEach(currentAuthor -> currentAuthor.setFullName(name));
+        bookDao.saveAll(books);
     }
 
     @Override
-    public void delete(Long authorId) {
-        try {
-            authorDao.deleteById(authorId);
-        } catch (DataIntegrityViolationException e) {
+    public void delete(String authorId) {
+        if (bookDao.findByAuthors(checkAndReturnAuthorIfExists(authorId)).size() > 0) {
             throw new BiblioServiceException("AUTHOR WASN'T REMOVED DUE TO SOME BOOKS HAVE LINK TO THIS AUTHOR\n" +
-                    "REMOVE THIS AUTHOR FROM THE BOOKS FIRST", e);
-        } catch (EmptyResultDataAccessException e) {
-            throw new BiblioServiceException(String.format("Author with id %d do not found", authorId), e);
+                    "REMOVE THIS AUTHOR FROM THE BOOKS FIRST");
         }
+        authorDao.deleteById(authorId);
     }
 
-    private Author checkAndReturnAuthorIfExists(Long id) {
+    private Author checkAndReturnAuthorIfExists(String id) {
         return authorDao.findById(id)
-                .orElseThrow(() -> new BiblioServiceException(String.format("Author with id %d do not found", id)));
+                .orElseThrow(() -> new BiblioServiceException(String.format("Author with id %s do not found", id)));
     }
 }

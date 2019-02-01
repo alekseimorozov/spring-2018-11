@@ -27,7 +27,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book create(String title, Long genreId, Long authorId) {
+    public Book create(String title, String genreId, String authorId) {
         Book book = new Book();
         book.setGenre(checkAndReturnGenreIfExists(genreId));
         book.getAuthors().add(checkAndReturnAuthorIfExists(authorId));
@@ -37,43 +37,48 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> readAll() {
-        return (List<Book>) bookDao.findAll();
+        return bookDao.findAll();
     }
 
     @Override
-    public Book readById(Long id) {
+    public Book readById(String id) {
         return checkAndReturnBookIfExists(id);
     }
 
     @Override
     public List<Book> findByName(String name) {
-        return bookDao.findByTitleContainingIgnoreCase(name);
+        return bookDao.findByTitle(name);
     }
 
     @Override
     public List<Book> findByAuthorName(String author) {
-        return bookDao.findByAuthorName(author);
+        return bookDao.findBookByAuthorName(author);
     }
 
     @Override
-    public List<Book> findByAuthorId(Long authorId) {
-        return bookDao.findByAuthorId(authorId);
+    public List<Book> findByAuthorId(String authorId) {
+        return bookDao.findByAuthors(checkAndReturnAuthorIfExists(authorId));
     }
 
     @Override
-    public List<Book> findByGenreId(Long genreId) {
-        return bookDao.findByGenreId(genreId);
+    public List<Book> findByGenreId(String genreId) {
+        return bookDao.findByGenre(checkAndReturnGenreIfExists(genreId));
     }
 
     @Override
-    public void updateBookName(Long bookId, String name) {
+    public void updateBookName(String bookId, String name) {
         Book book = checkAndReturnBookIfExists(bookId);
         book.setTitle(name);
         bookDao.save(book);
     }
 
     @Override
-    public void updateBookGenre(Long bookId, Long genreId) {
+    public List<Author> findAuthorByBook(String bookId) {
+        return checkAndReturnBookIfExists(bookId).getAuthors();
+    }
+
+    @Override
+    public void updateBookGenre(String bookId, String genreId) {
         Book book = checkAndReturnBookIfExists(bookId);
         Genre genre = checkAndReturnGenreIfExists(genreId);
         book.setGenre(genre);
@@ -81,17 +86,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void addAuthorToBook(Long bookId, Long authorId) {
+    public void addAuthorToBook(String bookId, String authorId) {
         Book book = checkAndReturnBookIfExists(bookId);
         book.getAuthors().add(checkAndReturnAuthorIfExists(authorId));
         bookDao.save(book);
     }
 
     @Override
-    public void removeAuthorFromBook(Long bookId, Long authorId) {
+    public void removeAuthorFromBook(String bookId, String authorId) {
         Book book = checkAndReturnBookIfExists(bookId);
         for (int i = 0; i < book.getAuthors().size(); i++) {
-            if (book.getAuthors().get(i).getId() == authorId) {
+            if (book.getAuthors().get(i).getId().equals(authorId)) {
                 book.getAuthors().remove(i);
                 break;
             }
@@ -100,26 +105,56 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void delete(Long bookId) {
+    public void delete(String bookId) {
         try {
             bookDao.deleteById(bookId);
         } catch (EmptyResultDataAccessException e) {
-            throw new BiblioServiceException(String.format("Book with id %d do not found", bookId), e);
+            throw new BiblioServiceException(String.format("Book with id %s do not found", bookId), e);
         }
     }
 
-    private Genre checkAndReturnGenreIfExists(Long genreId) {
+    @Override
+    public void deleteComment(String bookId, int commentId) {
+        Book book = checkAndReturnBookIfExists(bookId);
+        try {
+            book.getComments().remove(commentId);
+        } catch (IndexOutOfBoundsException e) {
+            throw new BiblioServiceException(String.format("Comment with id: %d does not exist", commentId), e);
+        }
+        bookDao.save(book);
+    }
+
+    @Override
+    public void addComment(String bookId, String comment) {
+        Book book = checkAndReturnBookIfExists(bookId);
+        book.getComments().add(comment);
+        bookDao.save(book);
+    }
+
+    @Override
+    public List<String> readCommentsByBookId(String id) {
+        return checkAndReturnBookIfExists(id).getComments();
+    }
+
+    @Override
+    public void updateComment(String bookId, int commentId, String text) {
+        Book book = checkAndReturnBookIfExists(bookId);
+        book.getComments().set(commentId, text);
+        bookDao.save(book);
+    }
+
+    private Genre checkAndReturnGenreIfExists(String genreId) {
         return genreDao.findById(genreId)
-                .orElseThrow(() -> new BiblioServiceException(String.format("Genre with id: %d not exists", genreId)));
+                .orElseThrow(() -> new BiblioServiceException(String.format("Genre with id: %s not exists", genreId)));
     }
 
-    private Author checkAndReturnAuthorIfExists(Long authorId) {
+    private Author checkAndReturnAuthorIfExists(String authorId) {
         return authorDao.findById(authorId).orElseThrow(() ->
-                new BiblioServiceException(String.format("Author with id: %d not exists", authorId)));
+                new BiblioServiceException(String.format("Author with id: %s not exists", authorId)));
     }
 
-    private Book checkAndReturnBookIfExists(Long bookId) {
+    private Book checkAndReturnBookIfExists(String bookId) {
         return bookDao.findById(bookId)
-                .orElseThrow(() -> new BiblioServiceException(String.format("Book with id: %d not exists", bookId)));
+                .orElseThrow(() -> new BiblioServiceException(String.format("Book with id: %s not exists", bookId)));
     }
 }

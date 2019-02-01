@@ -9,7 +9,7 @@ public interface AuthorService {
 
     List<Author> readAll();
 
-    Author findById(Long id);
+    Author findById(String id);
 
     /**
      * Search authors by part of name
@@ -19,15 +19,7 @@ public interface AuthorService {
      */
     List<Author> findByName(String name);
 
-    /**
-     * Search all authors of book
-     *
-     * @param bookId
-     * @return list of authors of book or empty list
-     */
-    List<Author> findByBook(Long bookId);
+    void update(String id, String name);
 
-    void update(Long id, String name);
-
-    void delete(Long authorId);
+    void delete(String authorId);
 }

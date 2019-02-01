@@ -1,5 +1,6 @@
 package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
+import ru.otus.training.alekseimorozov.bibliootus.businesslogic.serviceexception.BiblioServiceException;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
 import java.util.List;
@@ -9,9 +10,9 @@ public interface GenreService {
 
     List<Genre> readAll();
 
-    Genre readById(Long genreId);
+    Genre readById(String genreId);
 
-    void update(Long genreId, String name);
+    void update(String genreId, String name);
 
-    void delete(Long genreId);
+    void delete(String genreId) throws BiblioServiceException;
 }

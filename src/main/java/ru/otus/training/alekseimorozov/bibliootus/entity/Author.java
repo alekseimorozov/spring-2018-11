@@ -1,19 +1,19 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.Serializable;
 import java.util.Objects;
 
-@Entity
-@Table(name = "authors")
+@Document(collection = "authors")
 public class Author implements Serializable {
     @Transient
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(name = "full_name", nullable = false)
+    private String id;
     private String fullName;
 
     public Author() {
@@ -23,11 +23,11 @@ public class Author implements Serializable {
         this.fullName = fullName;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -41,7 +41,7 @@ public class Author implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s (id: %d)", getFullName(), getId());
+        return String.format("%s (id: %s)", getFullName(), getId());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class Author implements Serializable {
         return Objects.hash(id, fullName);
     }
 
-    public static Author getAuthor(Long id, String name) {
+    public static Author getAuthor(String id, String name) {
         Author author = new Author();
         author.setId(id);
         author.setFullName(name);

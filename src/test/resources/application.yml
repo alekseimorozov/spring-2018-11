@@ -1,9 +1,12 @@
 spring:
-  datasource:
-    name: jdbc:h2:mem:testdb
-    data: test_data.sql
+  data:
+    mongodb:
+      database: test
   banner:
     location: banner/practicelibBanner.txt
   output:
     ansi:
       enabled: ALWAYS
+logging:
+  level:
+    org.springframework.data.mongodb.coreMongoTemplate: DEBUG
