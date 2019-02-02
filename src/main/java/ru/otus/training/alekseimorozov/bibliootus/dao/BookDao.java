@@ -14,10 +14,13 @@ public interface BookDao extends MongoRepository<Book, String> {
     @Query(value = "{title: {$regex: ?0, $options: 'i'}}")
     List<Book> findByTitle(String title);
 
-    @Query(value = "{'authors.fullName': {$regex: ?0, $options: 'i'}}")
-    List<Book> findBookByAuthorName(String name);
-
     List<Book> findByAuthors(Author author);
 
+    List<Book> findByAuthorsIsIn(List<Author> authors);
+
     List<Book> findByGenre(Genre genre);
+
+    int countBookByAuthors(Author author);
+
+    int countBookByGenre(Genre genre);
 }

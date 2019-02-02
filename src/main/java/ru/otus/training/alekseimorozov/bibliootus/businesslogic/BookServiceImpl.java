@@ -51,8 +51,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> findByAuthorName(String author) {
-        return bookDao.findBookByAuthorName(author);
+    public List<Book> findByAuthorName(String authorName) {
+        List<Author> authors = authorDao.findByFullNameIgnoreCase(authorName);
+        return bookDao.findByAuthorsIsIn(authors);
     }
 
     @Override

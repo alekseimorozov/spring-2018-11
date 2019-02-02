@@ -8,13 +8,16 @@ import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @DisplayName("repository BookDao")
 class BookDaoTest extends CommonDaoMongoTest {
     @Autowired
     private BookDao bookDao;
-
 
     @BeforeEach
     public void start() {
@@ -57,21 +60,22 @@ class BookDaoTest extends CommonDaoMongoTest {
     }
 
     @Test
-    @DisplayName("finds Books by part of Authors full name")
-    public void findBookByAuthorName() {
-        assertThat(bookDao.findBookByAuthorName("SeCoNd")).containsOnly(firstBook, secondBook);
-    }
-
-    @Test
-    @DisplayName("returns empty list of Books if part of Author name not found")
-    public void findByAuthorNameNotFound() {
-        assertThat(bookDao.findBookByAuthorName("ZZ")).hasSize(0);
-    }
-
-    @Test
     @DisplayName("finds Books by Author")
     public void findByAuthors() {
         assertThat(bookDao.findByAuthors(firstAuthor)).containsOnly(firstBook, thirdBook);
+    }
+
+    @Test
+    @DisplayName("finds Books by List of Author")
+    public void findByAuthorsIsIn() {
+        List<Author> onlySecondAuthors = Arrays.asList(secondAuthor);
+        List<Author> firstAndThirdAuthors = Arrays.asList(firstAuthor, thirdAuthor);
+        List<Author> fourthAuthors = Arrays.asList(fourthAuthor);
+        List<Author> empty = new ArrayList<>();
+        assertThat(bookDao.findByAuthorsIsIn(onlySecondAuthors)).containsOnly(firstBook, secondBook);
+        assertThat(bookDao.findByAuthorsIsIn(firstAndThirdAuthors)).containsOnly(firstBook, secondBook, thirdBook);
+        assertThat(bookDao.findByAuthorsIsIn(fourthAuthors)).hasSize(0);
+        assertThat(bookDao.findByAuthorsIsIn(empty)).hasSize(0);
     }
 
     @Test
@@ -84,5 +88,21 @@ class BookDaoTest extends CommonDaoMongoTest {
     @DisplayName("finds Books which requiared Genre")
     public void findByGenreId() {
         assertThat(bookDao.findByGenre(firstGenre)).containsOnly(secondBook, thirdBook);
+    }
+
+    @Test
+    @DisplayName("return quantity of Books with required Genre")
+    public void countByGenreTest() {
+        assertThat(bookDao.countBookByGenre(firstGenre)).isEqualTo(2);
+        assertThat(bookDao.countBookByGenre(secondGenre)).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("returns quantity of  with required Author")
+    public void countBookByAuthorsTest() {
+        assertThat(bookDao.countBookByAuthors(firstAuthor)).isEqualTo(2);
+        assertThat(bookDao.countBookByAuthors(secondAuthor)).isEqualTo(2);
+        assertThat(bookDao.countBookByAuthors(thirdAuthor)).isEqualTo(2);
+        assertThat(bookDao.countBookByAuthors(fourthAuthor)).isEqualTo(0);
     }
 }

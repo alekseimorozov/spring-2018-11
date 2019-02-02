@@ -9,4 +9,4 @@ spring:
       enabled: ALWAYS
 logging:
   level:
-    org.springframework.data.mongodb.coreMongoTemplate: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG

@@ -6,7 +6,6 @@ import ru.otus.training.alekseimorozov.bibliootus.businesslogic.serviceexception
 import ru.otus.training.alekseimorozov.bibliootus.dao.AuthorDao;
 import ru.otus.training.alekseimorozov.bibliootus.dao.BookDao;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
-import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 
 import java.util.List;
 
@@ -47,19 +46,13 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public void update(String id, String name) {
         Author author = checkAndReturnAuthorIfExists(id);
-        List<Book> books = bookDao.findByAuthors(author);
         author.setFullName(name);
         authorDao.save(author);
-        books.stream()
-                .flatMap(book -> book.getAuthors().stream())
-                .filter(currentAuthor -> currentAuthor.getId().equals(id))
-                .forEach(currentAuthor -> currentAuthor.setFullName(name));
-        bookDao.saveAll(books);
     }
 
     @Override
     public void delete(String authorId) {
-        if (bookDao.findByAuthors(checkAndReturnAuthorIfExists(authorId)).size() > 0) {
+        if (bookDao.countBookByAuthors(checkAndReturnAuthorIfExists(authorId)) > 0) {
             throw new BiblioServiceException("AUTHOR WASN'T REMOVED DUE TO SOME BOOKS HAVE LINK TO THIS AUTHOR\n" +
                     "REMOVE THIS AUTHOR FROM THE BOOKS FIRST");
         }

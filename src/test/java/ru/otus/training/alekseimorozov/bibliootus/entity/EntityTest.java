@@ -46,7 +46,21 @@ class EntityTest {
         expected.getAuthors().add(second);
         expected.getAuthors().add(third);
         mongoTemplate.save(expected);
+        System.out.println("==============BEFORE================");
+        System.out.println(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Book.class));
+        first.setFullName("Modified First");
+        mongoTemplate.save(first);
         assertThat(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Book.class))
                 .as("", expected);
+        System.out.println("==============AFTER AUTHOR FIRST WAS UPDATED================");
+        System.out.println(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Book.class));
+        mongoTemplate.remove(first);
+        System.out.println("==============AFTER AUTHOR FIRST WAS REMOVED================");
+        System.out.println(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Book.class));
+        testGente.setName("UPDATED GENRE NAME");
+        mongoTemplate.save(testGente);
+        System.out.println("==============AFTER GENRE WAS UPDATED================");
+        System.out.println(mongoTemplate.findOne(new Query(where("_id").is(expected.getId())), Book.class));
+
     }
 }

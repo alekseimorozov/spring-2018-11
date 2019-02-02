@@ -73,38 +73,18 @@ public class AuthorServiceImplTest extends CommonServiceTest {
 
     @Test
     @DisplayName("calls authorDao.findById()," +
-            "then get all Books, cantainig this Author by colling bookDao.findByAuthors," +
-            "then change Author's fullName and save Author by calls authorDao.save()" +
-            "then change this Author in all Books authors list and save changes by calling bookDao.saveAll")
+            "then change Author's fullName and save Author by calls authorDao.save()")
     public void updateTest() {
         String id = "testId";
         Author updatedAuthor = getAuthor(id, "Test Author");
-        Author authorOne = getAuthor("one", "Other Author One");
-        Author authorTwo = getAuthor("two", "Other Author Two");
-        Book bookOne = new Book();
-        bookOne.getAuthors().add(getAuthor(id, "Test Author"));
-        bookOne.getAuthors().add(authorOne);
-        bookOne.getAuthors().add(authorTwo);
-        Book bookTwo = new Book();
-        bookTwo.getAuthors().add(getAuthor(id, "Test Author"));
-        Book bookThree = new Book();
-        bookThree.getAuthors().add(authorOne);
-        bookThree.getAuthors().add(getAuthor(id, "Test Author"));
-        List<Book> books = Arrays.asList(bookOne, bookTwo, bookThree);
-        InOrder inOrder = inOrder(authorDao, bookDao, authorDao, bookDao);
+        InOrder inOrder = inOrder(authorDao);
         when(authorDao.findById(id)).thenReturn(Optional.of(updatedAuthor));
-        when(bookDao.findByAuthors(updatedAuthor)).thenReturn(books);
         String updatedAuthorName = "UPDATED Test Author";
 
         authorService.update(id, updatedAuthorName);
         inOrder.verify(authorDao).findById(id);
-        inOrder.verify(bookDao).findByAuthors(updatedAuthor);
         inOrder.verify(authorDao).save(updatedAuthor);
-        inOrder.verify(bookDao).saveAll(books);
         assertThat(updatedAuthor.getFullName()).isEqualTo(updatedAuthorName);
-        assertThat(bookOne.getAuthors()).contains(updatedAuthor);
-        assertThat(bookTwo.getAuthors()).contains(updatedAuthor);
-        assertThat(bookThree.getAuthors()).contains(updatedAuthor);
     }
 
     @Test
@@ -118,14 +98,14 @@ public class AuthorServiceImplTest extends CommonServiceTest {
     @Test
     @DisplayName("check if Author exist, then checks that Books with this Author not exists and then delete Author")
     public void deleteTest() {
-        Optional<Author> optionalAuthor = Optional.of(getAuthor("id", "Test Author"));
+        Author author = getAuthor("id", "Test Author");
         InOrder inOrder = inOrder(authorDao, bookDao, authorDao);
-        when(authorDao.findById("id")).thenReturn(optionalAuthor);
-        when(bookDao.findByAuthors(optionalAuthor.get())).thenReturn(new ArrayList<>());
+        when(authorDao.findById("id")).thenReturn(Optional.of(author));
+        when(bookDao.countBookByAuthors(author)).thenReturn(0);
 
         authorService.delete("id");
         inOrder.verify(authorDao).findById("id");
-        inOrder.verify(bookDao).findByAuthors(optionalAuthor.get());
+        inOrder.verify(bookDao).countBookByAuthors(author);
         inOrder.verify(authorDao).deleteById("id");
     }
 
@@ -140,12 +120,9 @@ public class AuthorServiceImplTest extends CommonServiceTest {
     @Test
     @DisplayName("throws BiblioServiceException if try to delete Author thet exists in some Books")
     public void deleteAuthorExistsInBookTest() {
-        Book book = new Book();
-        List<Book> books = new ArrayList<>();
-        books.add(book);
-        Optional<Author> optionalAuthor = Optional.of(getAuthor("id", "Test Author"));
-        when(authorDao.findById("id")).thenReturn(optionalAuthor);
-        when(bookDao.findByAuthors(optionalAuthor.get())).thenReturn(books);
+        Author author = getAuthor("id", "Test Author");
+        when(authorDao.findById("id")).thenReturn(Optional.of(author));
+        when(bookDao.countBookByAuthors(author)).thenReturn(1);
         assertThatExceptionOfType(BiblioServiceException.class)
                 .isThrownBy(() -> authorService.delete("id"))
                 .withMessage("AUTHOR WASN'T REMOVED DUE TO SOME BOOKS HAVE LINK TO THIS AUTHOR\n" +

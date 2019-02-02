@@ -67,32 +67,18 @@ public class GenreServiceImplTest extends CommonServiceTest {
     }
 
     @Test
-    @DisplayName("get Genre by colling genreDao.findById(),  get all Books with the Genre, update Genre by colling " +
-            "genreDao.save(), update all genre in the Books, save the Books")
+    @DisplayName("get Genre by colling genreDao.findById(), modify and save Genre by colling genreDao.save()")
     public void updateTest() {
         String id = "testId";
         Genre updatedGenre = Genre.getGenre(id, "Test");
         String updatedGenreName = "Updated genre name";
+        InOrder inOrder = Mockito.inOrder(genreDao);
         when(genreDao.findById(id)).thenReturn(Optional.of(updatedGenre));
-        Book bookOne = new Book();
-        bookOne.setGenre(updatedGenre);
-        Book bookTwo = new Book();
-        bookTwo.setGenre(Genre.getGenre("otherId", "other genre"));
-        Book bookThree = new Book();
-        bookThree.setGenre(updatedGenre);
-        List<Book> books = Arrays.asList(bookOne, bookTwo, bookThree);
-        when(bookDao.findByGenre(updatedGenre)).thenReturn(books);
-        InOrder inOrder = Mockito.inOrder(genreDao, bookDao, genreDao, bookDao);
 
         genreService.update(id, updatedGenreName);
         inOrder.verify(genreDao).findById(id);
-        inOrder.verify(bookDao).findByGenre(updatedGenre);
         inOrder.verify(genreDao).save(updatedGenre);
-        inOrder.verify(bookDao).saveAll(books);
         assertThat(updatedGenre.getName()).isEqualTo(updatedGenreName);
-        assertThat(bookOne.getGenre()).isEqualTo(updatedGenre);
-        assertThat(bookTwo.getGenre()).isNotEqualTo(updatedGenre);
-        assertThat(bookThree.getGenre()).isEqualTo(updatedGenre);
     }
 
     @Test
@@ -105,18 +91,18 @@ public class GenreServiceImplTest extends CommonServiceTest {
 
     @Test
     @DisplayName("get genre by colling genreDao.findById, check if Book with such Genre exists by calling bookDao. " +
-            "findByGenre then delete the Genre by calling genreDao.delete() ")
+            "countBookByGenre() then delete the Genre by calling genreDao.delete() ")
     public void deleteTest() {
         String id = "testId";
         Genre genre = Genre.getGenre(id, "Test Genre");
         List<Book> books = new ArrayList<>();
         InOrder inOrder = Mockito.inOrder(genreDao, bookDao, genreDao);
         when(genreDao.findById(id)).thenReturn(Optional.of(genre));
-        when(bookDao.findByGenre(genre)).thenReturn(new ArrayList<>());
+        when(bookDao.countBookByGenre(genre)).thenReturn(0);
 
         genreService.delete(id);
         inOrder.verify(genreDao).findById(id);
-        inOrder.verify(bookDao).findByGenre(genre);
+        inOrder.verify(bookDao).countBookByGenre(genre);
         inOrder.verify(genreDao).deleteById(id);
     }
 }

@@ -13,6 +13,7 @@ import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Genre;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,16 +103,21 @@ class BookServiceImplTest extends CommonServiceTest {
     }
 
     @Test
-    @DisplayName("calls bookDao.findBookByAuthorName()")
+    @DisplayName("gets list of Authors with required name by authorDao.findByFullNameIgnoreCase() " +
+    "then get List of Books with required Author by calling bookDao.findByAuthorsIsIn() ")
     void findBookByAuthorName() {
         String testAuthorName = "test";
+        List<Author> authors = new ArrayList<>();
+        InOrder inOrder = inOrder(authorDao, bookDao);
+        when(authorDao.findByFullNameIgnoreCase(testAuthorName)).thenReturn(authors);
+
         bookService.findByAuthorName(testAuthorName);
-        verify(bookDao).findBookByAuthorName(testAuthorName);
+        verify(bookDao).findByAuthorsIsIn(authors);
     }
 
     @Test
-    @DisplayName("check if Author with required id exists by calling authorDao.findById() and then calls bookDao" +
-            ".findByAuthors()")
+    @DisplayName("check if Author with required id exists by calling authorDao.findById()" +
+            "and then calls bookDao.findByAuthors()")
     void findByAuthor() {
         Optional<Author> optionalAuthor = Optional.of(new Author());
         InOrder inOrder = inOrder(authorDao, bookDao);
