@@ -1,9 +1,9 @@
 spring:
-  datasource:
-    name: jdbc:h2:mem:bibliootus
-    data: initial_data.sql
   banner:
     location: banner/practicelibBanner.txt
   output:
     ansi:
       enabled: ALWAYS
+  data:
+    mongodb:
+      database: bibliootus

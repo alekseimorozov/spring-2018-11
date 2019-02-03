@@ -1,15 +1,16 @@
 package ru.otus.training.alekseimorozov.bibliootus.businesslogic;
 
+import ru.otus.training.alekseimorozov.bibliootus.entity.Author;
 import ru.otus.training.alekseimorozov.bibliootus.entity.Book;
 
 import java.util.List;
 
 public interface BookService {
-    Book create(String title, Long genreId, Long author_id);
+    Book create(String title, String genreId, String author_id);
 
     List<Book> readAll();
 
-    Book readById(Long id);
+    Book readById(String id);
 
     /**
      * Search books by part of name
@@ -33,7 +34,7 @@ public interface BookService {
      * @param authorId
      * @return list of books which was written by author with id = ""authorId
      */
-    List<Book> findByAuthorId(Long authorId);
+    List<Book> findByAuthorId(String authorId);
 
     /**
      * Search book by genreId
@@ -41,15 +42,31 @@ public interface BookService {
      * @param genreId genreId of book to search
      * @return list of book with genre equals "genre" or empty list
      */
-    List<Book> findByGenreId(Long genreId);
+    List<Book> findByGenreId(String genreId);
 
-    void updateBookName(Long bookId, String name);
+    /**
+     * Search all authors of book
+     *
+     * @param bookId
+     * @return list of authors of book or empty list
+     */
+    List<Author> findAuthorByBook(String bookId);
 
-    void updateBookGenre(Long bookId, Long genreId);
+    void updateBookName(String bookId, String name);
 
-    void addAuthorToBook(Long bookId, Long authorId);
+    void updateBookGenre(String bookId, String genreId);
 
-    void removeAuthorFromBook(Long bookId, Long authorId);
+    void addAuthorToBook(String bookId, String authorId);
 
-    void delete(Long bookId);
+    void removeAuthorFromBook(String bookId, String authorId);
+
+    void delete(String bookId);
+
+    void deleteComment(String bookId, int commentId);
+
+    void addComment(String bookId, String comment);
+
+    List<String> readCommentsByBookId(String id);
+
+    void updateComment(String bookId, int commentId, String text);
 }
