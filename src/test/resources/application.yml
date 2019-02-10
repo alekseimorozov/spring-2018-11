@@ -3,7 +3,7 @@ spring:
     mongodb:
       database: test
   banner:
-    location: banner/practicelibBanner.txt
+    location: banner/taskListBanner.txt
   output:
     ansi:
       enabled: ALWAYS
