@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Otus</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Task edit page</h1>
+            <form lass="form-horizontal" method="post" action="#" th:action="@{/save}" th:object="${task}">
+                <input type="hidden" th:field="*{id}">
+                <div class="form-group">
+                    <label class="control-label" for="title">title</label>
+                    <input type="text" class="form-control" id="title" th:field="*{title}">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="descr">Description</label>
+                    <textarea class="form-control" rows="5" id="descr" th:field="*{description}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="status">Status</label>
+                    <select class="form-control" id="status" th:field="*{status}">
+                        <option th:each="status : ${statuses}"
+                                th:value="${status}"
+                                th:text="#{${status.toString()}}">Wireframe
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="progress">progress</label>
+                    <input type="range" id="progress" min="0" max="100" th:field="*{progress}">
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="SAVE">
+                    <a href="tasks.html" class="btn btn-primary" th:href="@{/tasks}">BACK TO TASK LIST</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

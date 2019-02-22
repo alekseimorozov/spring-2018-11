@@ -1,4 +1,4 @@
-package ru.otus.training.alekseimorozov.bibliootus;
+package ru.otus.training.alekseimorozov.todolist;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
