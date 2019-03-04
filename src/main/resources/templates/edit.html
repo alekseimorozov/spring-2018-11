@@ -12,38 +12,39 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="/js/edit.js"></script>
 </head>
 <body>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
             <h1>Task edit page</h1>
-            <form lass="form-horizontal" method="post" action="#" th:action="@{/save}" th:object="${task}">
-                <input type="hidden" th:field="*{id}">
+            <form id="taskForm" lass="form-horizontal" method="post" action=#>
+                <input type="hidden" id="taskId" name="id" th:value="${id}">
                 <div class="form-group">
                     <label class="control-label" for="title">title</label>
-                    <input type="text" class="form-control" id="title" th:field="*{title}">
+                    <input type="text" class="form-control" id="title" name="title">
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="descr">Description</label>
-                    <textarea class="form-control" rows="5" id="descr" th:field="*{description}"></textarea>
+                    <textarea class="form-control" rows="5" id="descr" name="description"></textarea>
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="status">Status</label>
-                    <select class="form-control" id="status" th:field="*{status}">
+                    <select class="form-control" id="status" name="status">
                         <option th:each="status : ${statuses}"
                                 th:value="${status}"
-                                th:text="#{${status.toString()}}">Wireframe
+                                th:text="${status}">Wireframe
                         </option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="progress">progress</label>
-                    <input type="range" id="progress" min="0" max="100" th:field="*{progress}">
+                    <input type="range" id="progress" name="progress" min="0" max="100">
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-primary" value="SAVE">
-                    <a href="tasks.html" class="btn btn-primary" th:href="@{/tasks}">BACK TO TASK LIST</a>
+                    <a href="index.html" class="btn btn-primary" th:href="@{/}">BACK TO TASK LIST</a>
                 </div>
             </form>
         </div>

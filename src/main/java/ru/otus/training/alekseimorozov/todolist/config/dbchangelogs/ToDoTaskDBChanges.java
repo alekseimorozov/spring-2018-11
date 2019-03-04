@@ -8,7 +8,7 @@ import ru.otus.training.alekseimorozov.todolist.taskentities.ToDoTask;
 
 @ChangeLog
 public class ToDoTaskDBChanges {
-    @ChangeSet(order = "002", id="addTaskList", author = "Aleksei Morozov")
+    @ChangeSet(order = "003", id="addTasks", author = "Aleksei Morozov")
     public void addInitTasks(MongoTemplate template) {
         template.save(getInstance("Дерево", "Посадить дерево", Status.DONE, 100));
         template.save(getInstance("Дом", "Построить дом", Status.DICLINE, 0));
@@ -29,5 +29,4 @@ public class ToDoTaskDBChanges {
                 .progress(progress)
                 .build();
     }
-
 }

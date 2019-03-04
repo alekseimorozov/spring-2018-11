@@ -9,6 +9,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "tasks")
