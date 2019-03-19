@@ -2,11 +2,11 @@ package ru.otus.training.alekseimorozov.todolist.contollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.training.alekseimorozov.todolist.repo.TaskRepository;
 import ru.otus.training.alekseimorozov.todolist.taskentities.Status;
 import ru.otus.training.alekseimorozov.todolist.taskentities.ToDoTask;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -19,18 +19,18 @@ public class TaskRestController {
     }
 
     @GetMapping()
-    public List<ToDoTask> getAllTasks() {
+    public Flux<ToDoTask> getAllTasks() {
         return taskRepository.findAll();
     }
 
     @GetMapping("/{taskId}")
-    public ToDoTask getById(@PathVariable String taskId) {
+    public Mono<ToDoTask> getById(@PathVariable String taskId) {
         return taskRepository.findById(taskId)
-                .orElse(ToDoTask.builder().title("New task").status(Status.NEW).build());
+                .switchIfEmpty(Mono.just(ToDoTask.builder().title("New task").status(Status.NEW).build()));
     }
 
     @PostMapping()
-    public ToDoTask saveTask(ToDoTask task) {
+    public Mono<ToDoTask> saveTask(ToDoTask task) {
         if (task.getId() != null && task.getId().isEmpty()) {
             task.setId(null);
         }
