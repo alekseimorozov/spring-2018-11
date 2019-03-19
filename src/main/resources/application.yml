@@ -6,4 +6,4 @@ spring:
       enabled: ALWAYS
   data:
     mongodb:
-      database: bibliootus
+      database: todolist
