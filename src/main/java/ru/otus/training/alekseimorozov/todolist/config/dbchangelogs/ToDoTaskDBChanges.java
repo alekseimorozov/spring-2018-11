@@ -3,12 +3,14 @@ package ru.otus.training.alekseimorozov.todolist.config.dbchangelogs;
 import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.otus.training.alekseimorozov.todolist.taskentities.Status;
 import ru.otus.training.alekseimorozov.todolist.taskentities.ToDoTask;
+import ru.otus.training.alekseimorozov.todolist.taskentities.User;
 
 @ChangeLog
 public class ToDoTaskDBChanges {
-    @ChangeSet(order = "003", id="addTasks", author = "Aleksei Morozov")
+    @ChangeSet(order = "003", id = "addTasks", author = "Aleksei Morozov")
     public void addInitTasks(MongoTemplate template) {
         template.save(getInstance("Дерево", "Посадить дерево", Status.DONE, 100));
         template.save(getInstance("Дом", "Построить дом", Status.DICLINE, 0));
@@ -19,6 +21,17 @@ public class ToDoTaskDBChanges {
         template.save(getInstance("Spring", "Освоить Spring", Status.INPROGRESS, 65));
         template.save(getInstance("Работа", "Получить работу мечты", Status.INPROGRESS, 25));
         template.save(getInstance("Отпуск", "Поехать к теплому морю", Status.PENDING, 0));
+    }
+
+    @ChangeSet(order = "005", id = "addUser", author = "Aleksei Morozov")
+    public void addUser(MongoTemplate template) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        template.save(
+                User.builder()
+                        .username("user@otus.ru")
+                        .password(encoder.encode("password"))
+                        .build()
+        );
     }
 
     private ToDoTask getInstance(String title, String description, Status status, int progress) {
