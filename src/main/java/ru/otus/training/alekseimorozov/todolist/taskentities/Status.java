@@ -5,7 +5,7 @@ public enum Status {
     public static final Status[] ALL = {NEW, INPROGRESS, PENDING, DONE, DICLINE};
     private final String name;
 
-    private Status(String name) {
+    Status(String name) {
         this.name = name;
     }
 }
