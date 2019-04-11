@@ -39,6 +39,6 @@ public class TaskRestController {
 
     @DeleteMapping("/{taskId}")
     public void delete(@PathVariable String taskId) {
-        taskRepository.deleteById(taskId);
+        taskRepository.deleteById(taskId).subscribe();
     }
 }
