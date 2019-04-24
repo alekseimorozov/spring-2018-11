@@ -1,36 +1,17 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Document(collection = "books")
 public class Book implements Serializable {
-    @Transient
-    private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-    @Id
-    private String id;
     private String title;
-    @DBRef
     private List<Author> authors = new ArrayList<>();
-    @DBRef
     private Genre genre;
     private List<String> comments = new ArrayList<>();
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -67,7 +48,7 @@ public class Book implements Serializable {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("Book title: ").append(title).append("(id: ").append(id).append(")\n")
+        result.append("Book title: ").append(title).append(")\n")
                 .append("genre: ").append(genre).append("\n")
                 .append("authors: ").append("\n");
         for (Author author : authors) {
@@ -85,12 +66,12 @@ public class Book implements Serializable {
             return false;
         }
         Book book = (Book) o;
-        return Objects.equals(id, book.id) && Objects.equals(title, book.title) && Objects.equals(genre, book.genre) &&
+        return Objects.equals(title, book.title) && Objects.equals(genre, book.genre) &&
                 Objects.deepEquals(authors.toArray(), book.authors.toArray()) && Objects.deepEquals(comments.toArray(), book.comments.toArray());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, genre);
+        return Objects.hash(title, genre);
     }
 }

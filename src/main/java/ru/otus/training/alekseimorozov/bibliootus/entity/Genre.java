@@ -1,19 +1,11 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.io.Serializable;
 import java.util.Objects;
 
-@Document(collection = "genres")
 public class Genre implements Serializable {
-    @Transient
     private static final long serialVersionUID = 1L;
 
-    @Id
-    private String id;
     private String name;
 
     public Genre() {
@@ -21,14 +13,6 @@ public class Genre implements Serializable {
 
     public Genre(String name) {
         this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -41,7 +25,7 @@ public class Genre implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s (id: %s)", getName(), getId());
+        return name;
     }
 
     @Override
@@ -53,21 +37,11 @@ public class Genre implements Serializable {
             return false;
         }
         Genre genre = (Genre) o;
-        if (name == null && genre.name == null) {
-            return id == genre.id;
-        }
-        return Objects.equals(id, genre.id) && Objects.equals(name, genre.name);
+        return Objects.equals(name, genre.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    public static Genre getGenre(String id, String name) {
-        Genre genre = new Genre();
-        genre.setId(id);
-        genre.setName(name);
-        return genre;
+        return Objects.hash(name);
     }
 }

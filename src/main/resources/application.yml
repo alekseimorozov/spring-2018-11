@@ -4,6 +4,9 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  datasource:
+    name: bibliootus
+    url: jdbc:h2:mem:bibliootus
   data:
     mongodb:
       database: bibliootus
