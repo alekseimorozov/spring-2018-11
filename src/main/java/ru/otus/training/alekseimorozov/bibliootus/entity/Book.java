@@ -1,14 +1,19 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Document(collection = "books")
 public class Book implements Serializable {
    private static final long serialVersionUID = 1L;
 
     private String title;
+    @DBRef
     private List<Author> authors = new ArrayList<>();
     private Genre genre;
     private List<String> comments = new ArrayList<>();
@@ -48,12 +53,11 @@ public class Book implements Serializable {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("Book title: ").append(title).append(")\n")
-                .append("genre: ").append(genre).append("\n")
-                .append("authors: ").append("\n");
+        result.append("Book title: ").append(title).append("; genre: ").append(genre).append("; authors:");
         for (Author author : authors) {
-            result.append(author).append("\n");
+            result.append(" ").append(author).append(",");
         }
+        result.deleteCharAt(result.length() - 1);
         return result.toString();
     }
 
@@ -67,7 +71,8 @@ public class Book implements Serializable {
         }
         Book book = (Book) o;
         return Objects.equals(title, book.title) && Objects.equals(genre, book.genre) &&
-                Objects.deepEquals(authors.toArray(), book.authors.toArray()) && Objects.deepEquals(comments.toArray(), book.comments.toArray());
+                Objects.deepEquals(authors.toArray(), book.authors.toArray()) &&
+                Objects.deepEquals(comments.toArray(), book.comments.toArray());
     }
 
     @Override

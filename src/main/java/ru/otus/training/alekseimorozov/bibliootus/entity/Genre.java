@@ -1,8 +1,11 @@
 package ru.otus.training.alekseimorozov.bibliootus.entity;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@Document(collection = "genres")
 public class Genre implements Serializable {
     private static final long serialVersionUID = 1L;
 

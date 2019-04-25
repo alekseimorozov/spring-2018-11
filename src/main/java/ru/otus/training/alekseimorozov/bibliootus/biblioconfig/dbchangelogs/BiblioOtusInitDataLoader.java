@@ -11,8 +11,11 @@ import java.util.Arrays;
 
 @ChangeLog
 public class BiblioOtusInitDataLoader {
+    private static final String AUTHOR_COLLECTION = "authors";
+    private static final String GENRES_COLLECTION = "genres";
+    private static final String BOOK_COLLECTION = "books";
 
-    @ChangeSet(order = "001", id = "add initial data to database", author = "Aleksei Morozov")
+    @ChangeSet(order = "005", id = "add initial data set", author = "Aleksei Morozov")
     public void fillLibrary(MongoTemplate mongoTemplate) {
         Author pushkin = mongoTemplate.save(new Author("ALEXANDR PUSKIN"));
         Author nosov = mongoTemplate.save(new Author("NIKOLAY NOSOV"));

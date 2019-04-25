@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 @EnableBatchProcessing
 @Configuration
@@ -91,6 +92,7 @@ public class ButchConfig {
             items.stream()
                     .flatMap(book -> {
                         template.update(INSERT_BOOK, new BeanPropertySqlParameterSource(book), bookIdHolder);
+                        logger.info("writing book: {}", book);
                         Long bookId = bookIdHolder.getKey().longValue();
                         List<AuthorToBookRelation> authorToBookRelations = new ArrayList<>();
                         for (Author author : book.getAuthors()) {
@@ -99,6 +101,7 @@ public class ButchConfig {
                                     new BeanPropertySqlParameterSource(author),
                                     authorIdHolder
                             );
+                            logger.info("write author: {}", author);
                             Long authorId = authorIdHolder.getKey().longValue();
                             AuthorToBookRelation relation = new AuthorToBookRelation();
                             relation.setBookId(bookId);
@@ -107,7 +110,11 @@ public class ButchConfig {
                         }
                         return authorToBookRelations.stream();
                     })
-                    .forEach(relation -> template.update(INSERT_AUTHOR_TO_BOOK, new BeanPropertySqlParameterSource(relation)));
+                    .forEach(relation -> {
+                        template.update(INSERT_AUTHOR_TO_BOOK, new BeanPropertySqlParameterSource(relation));
+                        logger.info("write relation for authorId: {} and bookId: {}", relation.getAuthorId(),
+                                relation.getBookId());
+                    });
         };
     }
 
@@ -116,7 +123,9 @@ public class ButchConfig {
         return stepBuilder.get("genreStep")
                 .<Genre, Genre>chunk(5)
                 .reader(reader)
+                .listener(new CustomRearListener<>())
                 .writer(writer)
+                .listener(new CustomWriteListener<>())
                 .faultTolerant()
                 .allowStartIfComplete(true)
                 .build();
@@ -127,6 +136,7 @@ public class ButchConfig {
         return stepBuilder.get("bookStep")
                 .<Book, Book>chunk(5)
                 .reader(reader)
+                .listener(new CustomRearListener<>())
                 .writer(writer)
                 .faultTolerant()
                 .allowStartIfComplete(true)
@@ -140,5 +150,39 @@ public class ButchConfig {
                 .start(genreStep)
                 .next(bookStep)
                 .build();
+    }
+
+    private static class CustomRearListener<I> implements ItemReadListener<I> {
+        @Override
+        public void beforeRead() {
+            logger.debug("before read");
+        }
+
+        @Override
+        public void afterRead(I item) {
+            logger.info("after read item: {}", item);
+        }
+
+        @Override
+        public void onReadError(Exception ex) {
+            logger.error("Exception during item reading {}", ex.getMessage());
+        }
+    }
+
+    private static class CustomWriteListener<I> implements ItemWriteListener<I> {
+        @Override
+        public void beforeWrite(List<? extends I> items) {
+            items.stream().forEach(item -> logger.debug("before write item: {}", item));
+        }
+
+        @Override
+        public void afterWrite(List<? extends I> items) {
+            items.stream().forEach(item -> logger.info("after write item: {}", item));
+        }
+
+        @Override
+        public void onWriteError(Exception exception, List<? extends I> items) {
+            items.stream().forEach(item -> logger.error("exception while write item: {} {}", item, exception.getMessage()));
+        }
     }
 }
