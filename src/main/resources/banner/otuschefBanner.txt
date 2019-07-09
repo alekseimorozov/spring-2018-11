@@ -1,0 +1,10 @@
+
+${AnsiColor.BRIGHT_YELLOW}    )                     (                 )         (
+${AnsiColor.YELLOW} ( /(     *   )           )\ )     (     ( /(         )\ )
+${AnsiColor.BRIGHT_RED} )\())  ` )  /(      (   (()/(     )\    )\())  (    (()/(
+${AnsiColor.RED}((_)\    ( )(_))     )\   /(_))  (((_)  ((_)\   )\    /(_))
+${AnsiColor.BRIGHT_RED}  ((_)  (_(_())   _ ((_) (_))    )\___   _((_) ((_)  (_))_|
+${AnsiColor.MAGENTA} / _ \  |_   _|  | | | | / __|  ((/ __| | || | | __| | |_
+${AnsiColor.BLUE}| (_) |   | |    | |_| | \__ \   | (__  | __ | | _|  | __|
+${AnsiColor.GREEN} \___/    |_|     \___/  |___/    \___| |_||_| |___| |_|
+
